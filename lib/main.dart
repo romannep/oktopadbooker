@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:oktopadupshot/app.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page 123'),
+      home: App(),
     );
   }
 }

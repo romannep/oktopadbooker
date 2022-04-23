@@ -2,7 +2,27 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:oktopadupshot/screens/accounts.dart';
 import 'package:oktopadupshot/screens/start.dart';
+
+const PAGE_SCROLL_TIME_MS = 200;
+
+final BUTTON_STYLE = TextButton.styleFrom(
+  backgroundColor: Colors.blue,
+);
+
+const BUTTON_TEXT_STYLE = const TextStyle(color: Colors.white);
+
+Widget createButton(String label, void Function() onPressed) => ElevatedButton(
+  onPressed: onPressed,
+  style: BUTTON_STYLE,
+  child: Text(label, style: BUTTON_TEXT_STYLE),
+);
+
+final marginWidget = SizedBox(
+  height: 15,
+);
+
 
 class App extends StatefulWidget {
   @override
@@ -13,16 +33,41 @@ class App extends StatefulWidget {
 
 }
 
+class ScreenWrapper extends StatelessWidget {
+  Widget child;
+  ScreenWrapper(this.child);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            constraints: BoxConstraints(
+              minHeight: 0,
+              maxHeight:  450,
+              minWidth: 0,
+              maxWidth: 600,
+            ),
+            child: child,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class AppState extends State<App> {
 
   final pageController = PageController(initialPage: 0);
 
   back() {
-    pageController.animateToPage(pageController.page!.toInt() - 1, duration: Duration(milliseconds: 500), curve: Curves.linear);
+    pageController.animateToPage(pageController.page!.toInt() - 1, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
   }
 
   forward() {
-    pageController.animateToPage(pageController.page!.toInt() + 1, duration: Duration(milliseconds: 500), curve: Curves.linear);
+    pageController.animateToPage(pageController.page!.toInt() + 1, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
   }
 
   @override
@@ -43,8 +88,8 @@ class AppState extends State<App> {
       body: PageView(
         controller: pageController,
         children: [
-          StartScreen(appState: this),
-          StartScreen(appState: this),
+          ScreenWrapper(StartScreen(appState: this)),
+          ScreenWrapper(Accounts(appState: this)),
         ],
       ),
     );

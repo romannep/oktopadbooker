@@ -17,29 +17,21 @@ class StartScreen extends StatelessWidget {
     appState.navigate();
   }
 
+  setupAccounts() {
+    appState.navigate();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Center(child: Column(
+    return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        ElevatedButton(
-          onPressed: changeData,
-          style: TextButton.styleFrom(
-            backgroundColor: Colors.blue,
-          ),
-          child: Text('Ввести или изменить данные', style: TextStyle(color: Colors.white)),
-        ),
-        SizedBox(
-          height: 15,
-        ),
-        ElevatedButton(
-          onPressed: seeResults,
-          style: TextButton.styleFrom(
-            backgroundColor: Colors.blue,
-          ),
-          child: Text('Посмотреть результаты', style: TextStyle(color: Colors.white)),
-        ),
+        createButton('Добавить или изменить проводки', changeData),
+        marginWidget,
+        createButton('Посмотреть результаты', seeResults),
+        marginWidget,
+        createButton('Настроить счета', setupAccounts),
       ],
-    ));
+    );
   }
 }

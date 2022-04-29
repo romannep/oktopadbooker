@@ -68,19 +68,34 @@ class AppState extends State<App> {
 
   final pageController = PageController(initialPage: 0);
   final List<Widget> screens = []; // has extra screen (Start) to have ability to scroll after setState
+  final List<Widget> buttons = [];
 
   back() {
     pageController.animateToPage(pageController.page!.toInt() - 1, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
+    setTitleButtons(pageController.page!.toInt() - 1);
   }
 
   forward() {
     pageController.animateToPage(pageController.page!.toInt() + 1, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
+    setTitleButtons(pageController.page!.toInt() + 1);
+  }
+
+  setTitleButtons([newPage = -1]) {
+    setState(() {
+      int page = newPage > -1 ? newPage : pageController.page!.toInt();
+      int pageCount = screens.length - 2;
+      buttons.clear();
+      buttons.add(IconButton(onPressed: page > 0 ? back : null, icon: Icon(Icons.arrow_back)));
+      buttons.add(IconButton(onPressed: page < pageCount ? forward : null, icon: Icon(Icons.arrow_forward)));
+    });
   }
 
   @override
   void initState() {
     screens.add(ScreenWrapper(StartScreen(appState: this)));
     screens.add(ScreenWrapper(StartScreen(appState: this)));
+    buttons.add(IconButton(onPressed: null, icon: Icon(Icons.arrow_back)));
+    buttons.add(IconButton(onPressed: null, icon: Icon(Icons.arrow_forward)));
     super.initState();
   }
 
@@ -89,10 +104,7 @@ class AppState extends State<App> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
-          children: [
-            IconButton(onPressed: back, icon: Icon(Icons.arrow_back)),
-            IconButton(onPressed: forward, icon: Icon(Icons.arrow_forward)),
-          ],
+          children: buttons,
         ),
       ),
       // body: StartScreen(appState: this),
@@ -126,6 +138,7 @@ class AppState extends State<App> {
         }
       }
       screens.add(ScreenWrapper(StartScreen(appState: this))); // To have ability to scroll after setState for next screen
+      setTitleButtons(page);
       WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
         pageController.animateToPage(page, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
       });

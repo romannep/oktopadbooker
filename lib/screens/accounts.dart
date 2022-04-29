@@ -21,14 +21,16 @@ class AccountsState extends State<Accounts> {
 
   AccountsState({ required this.appState });
 
+  openAccount() {
+    appState.navigate(Screen.Account);
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        createButton('Добавить новый счет', (){}),
+        createButton('Добавить новый счет', openAccount),
         marginWidget,
         Expanded(
           child: ListView(

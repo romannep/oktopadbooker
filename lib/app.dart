@@ -24,6 +24,11 @@ final marginWidget = SizedBox(
   height: 15,
 );
 
+enum Screen {
+  Start,
+  Accounts,
+  Account,
+}
 
 class App extends StatefulWidget {
   @override
@@ -62,6 +67,7 @@ class ScreenWrapper extends StatelessWidget {
 class AppState extends State<App> {
 
   final pageController = PageController(initialPage: 0);
+  final List<Widget> screens = []; // has extra screen (Start) to have ability to scroll after setState
 
   back() {
     pageController.animateToPage(pageController.page!.toInt() - 1, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
@@ -72,12 +78,16 @@ class AppState extends State<App> {
   }
 
   @override
+  void initState() {
+    screens.add(ScreenWrapper(StartScreen(appState: this)));
+    screens.add(ScreenWrapper(StartScreen(appState: this)));
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        // title: Text('Otkopad Upshot'),
         title: Row(
           children: [
             IconButton(onPressed: back, icon: Icon(Icons.arrow_back)),
@@ -88,16 +98,37 @@ class AppState extends State<App> {
       // body: StartScreen(appState: this),
       body: PageView(
         controller: pageController,
-        children: [
-          ScreenWrapper(StartScreen(appState: this)),
-          ScreenWrapper(Accounts(appState: this)),
-          ScreenWrapper(Account(appState: this)),
-        ],
+        children: screens,
       ),
     );
   }
 
-  navigate() {
-    print('navigate');
+  navigate(Screen? screen) {
+    if (screen == null) {
+      return;
+    }
+    print('navigate to $screen cur page ${pageController.page!.toInt()}');
+    int page = pageController.page!.toInt();
+    screens.removeRange(page + 1, screens.length);
+    page++;
+    setState(() {
+      switch (screen) {
+        case Screen.Accounts: {
+          screens.add(ScreenWrapper(Accounts(appState: this)));
+          break;
+        }
+        case Screen.Account: {
+          screens.add(ScreenWrapper(Account(appState: this)));
+          break;
+        }
+        default: {
+          page = 0;
+        }
+      }
+      screens.add(ScreenWrapper(StartScreen(appState: this))); // To have ability to scroll after setState for next screen
+      WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
+        pageController.animateToPage(page, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
+      });
+    });
   }
 }

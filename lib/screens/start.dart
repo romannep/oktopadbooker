@@ -10,15 +10,15 @@ class StartScreen extends StatelessWidget {
   });
 
   changeData() {
-    appState.navigate();
+    appState.navigate(null);
   }
 
   seeResults() {
-    appState.navigate();
+    appState.navigate(null);
   }
 
   setupAccounts() {
-    appState.navigate();
+    appState.navigate(Screen.Accounts);
   }
 
   @override

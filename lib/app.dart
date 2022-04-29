@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:oktopadupshot/screens/account.dart';
 import 'package:oktopadupshot/screens/accounts.dart';
 import 'package:oktopadupshot/screens/start.dart';
 
@@ -90,6 +91,7 @@ class AppState extends State<App> {
         children: [
           ScreenWrapper(StartScreen(appState: this)),
           ScreenWrapper(Accounts(appState: this)),
+          ScreenWrapper(Account(appState: this)),
         ],
       ),
     );

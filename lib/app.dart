@@ -30,6 +30,10 @@ enum Screen {
   Account,
 }
 
+void animateTo(PageController pageController, int page) {
+  pageController.animateToPage(page, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
+}
+
 class App extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -71,12 +75,12 @@ class AppState extends State<App> {
   final List<Widget> buttons = [];
 
   back() {
-    pageController.animateToPage(pageController.page!.toInt() - 1, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
+    animateTo(pageController, pageController.page!.toInt() - 1);
     setTitleButtons(pageController.page!.toInt() - 1);
   }
 
   forward() {
-    pageController.animateToPage(pageController.page!.toInt() + 1, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
+    animateTo(pageController, pageController.page!.toInt() + 1);
     setTitleButtons(pageController.page!.toInt() + 1);
   }
 
@@ -119,7 +123,6 @@ class AppState extends State<App> {
     if (screen == null) {
       return;
     }
-    print('navigate to $screen cur page ${pageController.page!.toInt()}');
     int page = pageController.page!.toInt();
     screens.removeRange(page + 1, screens.length);
     page++;
@@ -140,7 +143,7 @@ class AppState extends State<App> {
       screens.add(ScreenWrapper(StartScreen(appState: this))); // To have ability to scroll after setState for next screen
       setTitleButtons(page);
       WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
-        pageController.animateToPage(page, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
+        animateTo(pageController, page);
       });
     });
   }

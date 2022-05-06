@@ -71,7 +71,9 @@ class AppState extends State<App> {
 
   final pageController = PageController(initialPage: 0);
   final List<Widget> screens = []; // has extra screen (Start) to have ability to scroll after setState
+  final List<String> titles = [];
   final List<Widget> buttons = [];
+  String title = '';
 
   back() {
     animateTo(pageController, pageController.page!.toInt() - 1);
@@ -86,16 +88,19 @@ class AppState extends State<App> {
   setTitleButtons([newPage = -1]) {
     setState(() {
       int page = newPage > -1 ? newPage : pageController.page!.toInt();
+      title = titles[page];
       int pageCount = screens.length - 2;
       buttons.clear();
       buttons.add(IconButton(onPressed: page > 0 ? back : null, icon: Icon(Icons.arrow_back)));
       buttons.add(IconButton(onPressed: page < pageCount ? forward : null, icon: Icon(Icons.arrow_forward)));
+      buttons.add(Text(title));
     });
   }
 
   @override
   void initState() {
     screens.add(ScreenWrapper(StartScreen(appState: this)));
+    titles.add('');
     screens.add(ScreenWrapper(StartScreen(appState: this)));
     buttons.add(IconButton(onPressed: null, icon: Icon(Icons.arrow_back)));
     buttons.add(IconButton(onPressed: null, icon: Icon(Icons.arrow_forward)));
@@ -124,15 +129,18 @@ class AppState extends State<App> {
     }
     int page = pageController.page!.toInt();
     screens.removeRange(page + 1, screens.length);
+    titles.removeRange(page + 1, screens.length);
     page++;
     setState(() {
       switch (screen) {
         case Screen.Accounts: {
           screens.add(ScreenWrapper(Accounts(appState: this)));
+          titles.add('Счета');
           break;
         }
         case Screen.Account: {
           screens.add(ScreenWrapper(Account(appState: this)));
+          titles.add('Счет');
           break;
         }
         default: {

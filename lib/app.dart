@@ -37,7 +37,6 @@ void animateTo(PageController pageController, int page) {
 class App extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
-    // TODO: implement createState
     return AppState();
   }
 
@@ -56,7 +55,7 @@ class ScreenWrapper extends StatelessWidget {
           Container(
             constraints: BoxConstraints(
               minHeight: 0,
-              maxHeight:  450,
+              maxHeight:  435,
               minWidth: 0,
               maxWidth: 600,
             ),

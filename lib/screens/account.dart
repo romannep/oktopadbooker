@@ -24,7 +24,8 @@ enum AccountType {
   Passive,
 }
 
-class AccountState extends State<Account> {
+class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Account> {
+
   final AppState appState;
   late TextEditingController textNameController;
   List<String> subAccounts = [];
@@ -54,9 +55,6 @@ class AccountState extends State<Account> {
   void initState() {
     textNameController = TextEditingController();
     textNameController.addListener(_dataChange);
-    appState.onNavigationChange = () {
-      _saveData();
-    };
     super.initState();
   }
 
@@ -134,4 +132,11 @@ class AccountState extends State<Account> {
     ))]);
   }
 
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void dispose() {
+    _saveData();
+  }
 }

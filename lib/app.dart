@@ -79,14 +79,24 @@ class AppState extends State<App> {
   final List<Widget> buttons = [];
   String title = '';
 
+  void Function()? onNavigationChange;
+
   back() {
     animateTo(pageController, pageController.page!.toInt() - 1);
     setTitleButtons(pageController.page!.toInt() - 1);
+    if (onNavigationChange != null) {
+      onNavigationChange!();
+      onNavigationChange = null;
+    }
   }
 
   forward() {
     animateTo(pageController, pageController.page!.toInt() + 1);
     setTitleButtons(pageController.page!.toInt() + 1);
+    if (onNavigationChange != null) {
+      onNavigationChange!();
+      onNavigationChange = null;
+    }
   }
 
   setTitleButtons([newPage = -1]) {

@@ -19,11 +19,17 @@ class Account extends StatefulWidget {
 
 }
 
+enum AccountType {
+  Active,
+  Passive,
+}
+
 class AccountState extends State<Account> {
   final AppState appState;
   late TextEditingController textNameController;
   List<String> subAccounts = [];
   List<TextEditingController> textSubAccountsControllers = [];
+  AccountType type = AccountType.Active;
 
   AccountState({ required this.appState });
 
@@ -31,10 +37,15 @@ class AccountState extends State<Account> {
   _dataChange() {
     if (_changeTimer != null) {
       _changeTimer!.cancel();
+      _changeTimer = null;
     }
     _changeTimer = new Timer(Duration(milliseconds: DEBOUNCE_TIMEOUT_MS), _saveData);
   }
   _saveData() {
+    if (_changeTimer != null) {
+      _changeTimer!.cancel();
+      _changeTimer = null;
+    }
     print('saving....');
   }
 
@@ -43,6 +54,9 @@ class AccountState extends State<Account> {
   void initState() {
     textNameController = TextEditingController();
     textNameController.addListener(_dataChange);
+    appState.onNavigationChange = () {
+      _saveData();
+    };
     super.initState();
   }
 
@@ -63,6 +77,13 @@ class AccountState extends State<Account> {
     });
   }
 
+  changeAccountType(AccountType? newType) {
+    setState(() {
+      type = newType == null ? AccountType.Active : newType;
+      _dataChange();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final widget = Column(
@@ -71,6 +92,15 @@ class AccountState extends State<Account> {
         TextField(
           decoration: InputDecoration(labelText: 'Название'),
           controller: textNameController,
+        ),
+        marginWidget,
+        Row(
+          children: [
+            Radio<AccountType>(value: AccountType.Active, groupValue: type, onChanged: (value) => changeAccountType(value)),
+            Text('Активный'),
+            Radio<AccountType>(value: AccountType.Passive, groupValue: type, onChanged: (value) => changeAccountType(value)),
+            Text('Пассивный'),
+          ],
         ),
         marginWidget,
         Text('Субсчета'),

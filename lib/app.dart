@@ -6,6 +6,8 @@ import 'package:oktopadupshot/screens/account.dart';
 import 'package:oktopadupshot/screens/accounts.dart';
 import 'package:oktopadupshot/screens/start.dart';
 
+import 'db.dart';
+
 const PAGE_SCROLL_TIME_MS = 200;
 
 final BUTTON_STYLE = TextButton.styleFrom(
@@ -13,6 +15,8 @@ final BUTTON_STYLE = TextButton.styleFrom(
 );
 
 const BUTTON_TEXT_STYLE = const TextStyle(color: Colors.white);
+
+const DEBOUNCE_TIMEOUT_MS = 1000;
 
 Widget createButton(String label, void Function() onPressed) => ElevatedButton(
   onPressed: onPressed,
@@ -105,6 +109,8 @@ class AppState extends State<App> {
     buttons.add(IconButton(onPressed: null, icon: Icon(Icons.arrow_back)));
     buttons.add(IconButton(onPressed: null, icon: Icon(Icons.arrow_forward)));
     super.initState();
+
+    Db.instance.init();
   }
 
   @override

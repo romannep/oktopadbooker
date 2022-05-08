@@ -1,4 +1,6 @@
 
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
@@ -25,17 +27,31 @@ class AccountState extends State<Account> {
 
   AccountState({ required this.appState });
 
+  Timer? _changeTimer;
+  _dataChange() {
+    if (_changeTimer != null) {
+      _changeTimer!.cancel();
+    }
+    _changeTimer = new Timer(Duration(milliseconds: DEBOUNCE_TIMEOUT_MS), _saveData);
+  }
+  _saveData() {
+    print('saving....');
+  }
+
+
   @override
   void initState() {
     textNameController = TextEditingController();
-    textNameController.text = 'asd 123';
+    textNameController.addListener(_dataChange);
     super.initState();
   }
 
   void addSubAccount() {
     setState(() {
       subAccounts.add('');
-      textSubAccountsControllers.add(TextEditingController());
+      final controller = TextEditingController();
+      controller.addListener(_dataChange);
+      textSubAccountsControllers.add(controller);
     });
 
   }

@@ -4,22 +4,22 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:oktopadupshot/app.dart';
 
-class Accounts extends StatefulWidget {
+class Records extends StatefulWidget {
   final AppState appState;
 
-  Accounts({ required this.appState, Key? key}) : super(key: key);
+  Records({ required this.appState, Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return new AccountsState(appState: appState);
+    return new RecordsState(appState: appState);
   }
 
 }
 
-class AccountsState extends State<Accounts> {
+class RecordsState extends State<Records> {
   final AppState appState;
 
-  AccountsState({ required this.appState });
+  RecordsState({ required this.appState });
 
   openAccount() {
     appState.navigate(Screen.Account);
@@ -34,7 +34,7 @@ class AccountsState extends State<Accounts> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        createButton('Добавить новый счет', newAccount),
+        createButton('Добавить новую проводку', newAccount),
         marginWidget,
         Expanded(
           child: ListView(

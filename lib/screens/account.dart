@@ -10,11 +10,11 @@ import '../app.dart';
 class Account extends StatefulWidget {
   final AppState appState;
 
-  Account({ required this.appState });
+  Account({ required this.appState, Key? key }): super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return AccountState( appState: appState);
+    return AccountState(appState: appState);
   }
 
 }
@@ -50,7 +50,7 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
     print('saving....');
   }
 
-
+  // Key? key;
   @override
   void initState() {
     textNameController = TextEditingController();
@@ -127,9 +127,6 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
     );
 
     return widget;
-    return Column(children: [Expanded(child: SingleChildScrollView(
-      child: widget
-    ))]);
   }
 
   @override
@@ -138,5 +135,6 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
   @override
   void dispose() {
     _saveData();
+    super.dispose();
   }
 }

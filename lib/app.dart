@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:oktopadupshot/screens/account.dart';
 import 'package:oktopadupshot/screens/accounts.dart';
+import 'package:oktopadupshot/screens/records.dart';
 import 'package:oktopadupshot/screens/start.dart';
 
 import 'db.dart';
@@ -32,6 +33,17 @@ enum Screen {
   Start,
   Accounts,
   Account,
+  Records,
+}
+
+class ScreenParams {
+  bool newItem;
+  String? id;
+
+  ScreenParams({
+    this.newItem = false,
+    this.id,
+  });
 }
 
 void animateTo(PageController pageController, int page) {
@@ -48,7 +60,7 @@ class App extends StatefulWidget {
 
 class ScreenWrapper extends StatelessWidget {
   Widget child;
-  ScreenWrapper(this.child);
+  ScreenWrapper(this.child, [Key? key]): super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -134,18 +146,18 @@ class AppState extends State<App> {
       // body: StartScreen(appState: this),
       body: PageView(
         controller: pageController,
-        children: screens,
+        children: [...screens],
       ),
     );
   }
 
-  navigate(Screen? screen) {
+  navigate(Screen? screen, [ScreenParams? params]) {
     if (screen == null) {
       return;
     }
     int page = pageController.page!.toInt();
     screens.removeRange(page + 1, screens.length);
-    titles.removeRange(page + 1, screens.length);
+    titles.removeRange(page + 1, titles.length);
     page++;
     setState(() {
       switch (screen) {
@@ -155,8 +167,17 @@ class AppState extends State<App> {
           break;
         }
         case Screen.Account: {
-          screens.add(ScreenWrapper(Account(appState: this)));
+          Key? key = null;
+          if (params != null && params.newItem) {
+            key = UniqueKey();
+          }
+          screens.add(ScreenWrapper(Account(appState: this, key: key)));
           titles.add('Счет');
+          break;
+        }
+        case Screen.Records: {
+          screens.add(ScreenWrapper(Records(appState: this)));
+          titles.add('Проводки');
           break;
         }
         default: {

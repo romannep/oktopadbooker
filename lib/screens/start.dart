@@ -10,7 +10,7 @@ class StartScreen extends StatelessWidget {
   });
 
   changeData() {
-    appState.navigate(null);
+    appState.navigate(Screen.Records);
   }
 
   seeResults() {

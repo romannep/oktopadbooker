@@ -83,38 +83,48 @@ class ScreenWrapper extends StatelessWidget {
   }
 }
 
+class ScreenController {
+  // may be it's overkill, as in PageView every page creates state on activate
+  // unless using AutomaticKeepAliveClientMixin
+  void Function()? onActivate;
+}
+
+class ScreenItem {
+  Widget widget;
+  String title;
+  ScreenController controller;
+  ScreenItem({
+    required this.widget,
+    required this.title,
+    required this.controller,
+  });
+}
+
 class AppState extends State<App> {
 
   final pageController = PageController(initialPage: 0);
-  final List<Widget> screens = []; // has extra screen (Start) to have ability to scroll after setState
-  final List<String> titles = [];
+  final List<ScreenItem> screens = []; // has extra screen (Start) to have ability to scroll after setState
+  final List<void Function()> onActivate = [];
   final List<Widget> buttons = [];
   String title = '';
 
-  void Function()? onNavigationChange;
-
   back() {
     animateTo(pageController, pageController.page!.toInt() - 1);
-    setTitleButtons(pageController.page!.toInt() - 1);
-    if (onNavigationChange != null) {
-      onNavigationChange!();
-      onNavigationChange = null;
-    }
+    processNavigate(pageController.page!.toInt() - 1);
   }
 
   forward() {
     animateTo(pageController, pageController.page!.toInt() + 1);
-    setTitleButtons(pageController.page!.toInt() + 1);
-    if (onNavigationChange != null) {
-      onNavigationChange!();
-      onNavigationChange = null;
-    }
+    processNavigate(pageController.page!.toInt() + 1);
   }
 
-  setTitleButtons([newPage = -1]) {
+  processNavigate([newPage = -1]) {
     setState(() {
       int page = newPage > -1 ? newPage : pageController.page!.toInt();
-      title = titles[page];
+      if (screens[page].controller.onActivate != null) {
+        screens[page].controller.onActivate!();
+      }
+      title = screens[page].title;
       int pageCount = screens.length - 2;
       buttons.clear();
       buttons.add(IconButton(onPressed: page > 0 ? back : null, icon: Icon(Icons.arrow_back)));
@@ -125,9 +135,13 @@ class AppState extends State<App> {
 
   @override
   void initState() {
-    screens.add(ScreenWrapper(StartScreen(appState: this)));
-    titles.add('');
-    screens.add(ScreenWrapper(StartScreen(appState: this)));
+    final item = ScreenItem(
+      widget: ScreenWrapper(StartScreen(appState: this)),
+      title: '',
+      controller: ScreenController(),
+    );
+    screens.add(item);
+    screens.add(item);
     buttons.add(IconButton(onPressed: null, icon: Icon(Icons.arrow_back)));
     buttons.add(IconButton(onPressed: null, icon: Icon(Icons.arrow_forward)));
     super.initState();
@@ -146,7 +160,7 @@ class AppState extends State<App> {
       // body: StartScreen(appState: this),
       body: PageView(
         controller: pageController,
-        children: [...screens],
+        children: screens.map((e) => e.widget).toList(),
       ),
     );
   }
@@ -157,13 +171,17 @@ class AppState extends State<App> {
     }
     int page = pageController.page!.toInt();
     screens.removeRange(page + 1, screens.length);
-    titles.removeRange(page + 1, titles.length);
     page++;
     setState(() {
       switch (screen) {
         case Screen.Accounts: {
-          screens.add(ScreenWrapper(Accounts(appState: this)));
-          titles.add('Счета');
+          final controller = ScreenController();
+          final item = ScreenItem(
+            widget: ScreenWrapper(Accounts(appState: this, screenController: controller)),
+            title: 'Счета',
+            controller: controller,
+          );
+          screens.add(item);
           break;
         }
         case Screen.Account: {
@@ -171,21 +189,34 @@ class AppState extends State<App> {
           if (params != null && params.newItem) {
             key = UniqueKey();
           }
-          screens.add(ScreenWrapper(Account(appState: this, key: key)));
-          titles.add('Счет');
+          final item = ScreenItem(
+            widget: ScreenWrapper(Account(appState: this, key: key)),
+            title: 'Счет',
+            controller: ScreenController(),
+          );
+          screens.add(item);
           break;
         }
         case Screen.Records: {
-          screens.add(ScreenWrapper(Records(appState: this)));
-          titles.add('Проводки');
+          final item = ScreenItem(
+            widget: ScreenWrapper(Records(appState: this)),
+            title: 'Проводки',
+            controller: ScreenController(),
+          );
+          screens.add(item);
           break;
         }
         default: {
           page = 0;
         }
       }
-      screens.add(ScreenWrapper(StartScreen(appState: this))); // To have ability to scroll after setState for next screen
-      setTitleButtons(page);
+      final item = ScreenItem(
+        widget: ScreenWrapper(StartScreen(appState: this)),
+        title: '',
+        controller: ScreenController(),
+      );
+      screens.add(item); // To have ability to scroll after setState for next screen
+      processNavigate(page);
       WidgetsBinding.instance!.addPostFrameCallback((timeStamp) {
         animateTo(pageController, page);
       });

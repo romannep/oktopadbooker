@@ -1,9 +1,11 @@
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
+import 'package:oktopadupshot/db.dart';
 
 import '../app.dart';
 
@@ -47,7 +49,12 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
       _changeTimer!.cancel();
       _changeTimer = null;
     }
-    print('saving....');
+
+    Db.instance.saveAccount({
+      'name': textNameController.text,
+      'active': type == AccountType.Active ? 1 : 0,
+      'sub': jsonEncode(textSubAccountsControllers.map((e) => e.text).toList())
+    });
   }
 
   // Key? key;
@@ -64,6 +71,7 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
       final controller = TextEditingController();
       controller.addListener(_dataChange);
       textSubAccountsControllers.add(controller);
+      _dataChange();
     });
 
   }
@@ -72,6 +80,7 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
     setState(() {
       subAccounts.removeAt(index);
       textSubAccountsControllers.removeAt(index);
+      _dataChange();
     });
   }
 

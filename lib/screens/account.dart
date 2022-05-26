@@ -11,12 +11,13 @@ import '../app.dart';
 
 class Account extends StatefulWidget {
   final AppState appState;
+  final int? itemId;
 
-  Account({ required this.appState, Key? key }): super(key: key);
+  Account({ required this.appState, this.itemId, Key? key }): super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return AccountState(appState: appState);
+    return AccountState();
   }
 
 }
@@ -28,15 +29,14 @@ enum AccountType {
 
 class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Account> {
 
-  final AppState appState;
+  late int? itemId;
   late TextEditingController textNameController;
   List<String> subAccounts = [];
   List<TextEditingController> textSubAccountsControllers = [];
   AccountType type = AccountType.Active;
 
-  AccountState({ required this.appState });
-
   Timer? _changeTimer;
+
   _dataChange() {
     if (_changeTimer != null) {
       _changeTimer!.cancel();
@@ -44,24 +44,44 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
     }
     _changeTimer = new Timer(Duration(milliseconds: DEBOUNCE_TIMEOUT_MS), _saveData);
   }
-  _saveData() {
+
+  _saveData() async {
     if (_changeTimer != null) {
       _changeTimer!.cancel();
       _changeTimer = null;
     }
 
-    Db.instance.saveAccount({
+    final newId = await Db.instance.saveAccount(itemId, {
       'name': textNameController.text,
       'active': type == AccountType.Active ? 1 : 0,
       'sub': jsonEncode(textSubAccountsControllers.map((e) => e.text).toList())
     });
+    itemId = newId;
   }
 
-  // Key? key;
+  _loadData() async {
+    if (itemId == null) {
+      return;
+    }
+    final data = await Db.instance.getAccount(itemId!);
+    setState(() {
+      textNameController.text = data['name'];
+      type = data['active'] == 1 ? AccountType.Active : AccountType.Passive;
+      subAccounts = (jsonDecode(data['sub']) as List<dynamic>).cast<String>();
+      textSubAccountsControllers.clear();
+      subAccounts.forEach((element) {
+        textSubAccountsControllers.add(TextEditingController(text: element));
+      });
+      print('got sub $subAccounts from ${data['sub']}');
+    });
+  }
+
   @override
   void initState() {
     textNameController = TextEditingController();
     textNameController.addListener(_dataChange);
+    itemId = widget.itemId;
+    _loadData();
     super.initState();
   }
 

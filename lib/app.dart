@@ -38,7 +38,7 @@ enum Screen {
 
 class ScreenParams {
   bool newItem;
-  String? id;
+  int? id;
 
   ScreenParams({
     this.newItem = false,
@@ -185,12 +185,9 @@ class AppState extends State<App> {
           break;
         }
         case Screen.Account: {
-          Key? key = null;
-          if (params != null && params.newItem) {
-            key = UniqueKey();
-          }
+          final key = UniqueKey();
           final item = ScreenItem(
-            widget: ScreenWrapper(Account(appState: this, key: key)),
+            widget: ScreenWrapper(Account(appState: this, key: key, itemId: params?.id)),
             title: 'Счет',
             controller: ScreenController(),
           );

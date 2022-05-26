@@ -16,7 +16,7 @@ class Accounts extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return new AccountsState(appState: appState, screenController: screenController);
+    return new AccountsState(screenController: screenController);
   }
 
 }
@@ -29,12 +29,11 @@ class AccountItem {
 }
 
 class AccountsState extends State<Accounts> {
-  final AppState appState;
   final ScreenController screenController;
   List<AccountItem> activeAccounts = [];
   List<AccountItem> passiveAccounts = [];
 
-  AccountsState({ required this.appState, required this.screenController });
+  AccountsState({ required this.screenController });
 
   @override
   initState() {
@@ -46,7 +45,7 @@ class AccountsState extends State<Accounts> {
 
   onActivate() async {
     final accountsData = await Db.instance.getAccounts();
-    print('got accounts $accountsData');
+    // print('got accounts $accountsData');
     setState(() {
       // accounts = accountsData;
       activeAccounts.clear();
@@ -64,18 +63,18 @@ class AccountsState extends State<Accounts> {
     });
   }
 
-  openAccount() {
-    appState.navigate(Screen.Account);
+  void openAccount(int id) {
+    widget.appState.navigate(Screen.Account, ScreenParams(id: id));
   }
 
   newAccount() {
-    appState.navigate(Screen.Account, ScreenParams(newItem: true));
+    widget.appState.navigate(Screen.Account, ScreenParams(newItem: true));
   }
 
   @override
   Widget build(BuildContext context) {
-    final actives = activeAccounts.map((e) => createListItem(e.name, e.id)).toList();
-    final passives = passiveAccounts.map((e) => createListItem(e.name, e.id)).toList();
+    final actives = activeAccounts.map((e) => createListItem(e.name, e.id, openAccount)).toList();
+    final passives = passiveAccounts.map((e) => createListItem(e.name, e.id, openAccount)).toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -84,16 +83,10 @@ class AccountsState extends State<Accounts> {
         Expanded(
           child: ListView(
             children: [
-              createListItem('Активные', -1),
+              createListItem('Активные', -1, openAccount),
               ...actives,
-              createListItem('Пассивные', -1),
+              createListItem('Пассивные', -1, openAccount),
               ...passives,
-              Container(
-                child: Text('acc 3'),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                ),
-              ),
             ],
           ),
         ),
@@ -103,13 +96,14 @@ class AccountsState extends State<Accounts> {
   }
 }
 
-Widget createListItem(String name, int id) {
+Widget createListItem(String name, id, void handler(int itemId)) {
   return ListTile(
     title: Text(name),
     visualDensity: VisualDensity(vertical:  -4),
     hoverColor: id > -1 ? Colors.blue : null,
     onTap: id == -1 ? null : () {
       print('tap on $id');
+      handler(id);
     },
   );
 }

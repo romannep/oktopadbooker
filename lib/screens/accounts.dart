@@ -51,12 +51,12 @@ class AccountsState extends State<Accounts> {
       activeAccounts.clear();
       passiveAccounts.clear();
       accountsData.forEach((element) {
-        final account = AccountItem(element['rowid'], ' - ${element['name']}');
+        final account = AccountItem(element['rowid'], ' ${element['name']}');
         final sub = (jsonDecode(element['sub']) as List<dynamic>).cast<String>();
         final listToAdd = element['active'] == 1 ? activeAccounts : passiveAccounts;
         listToAdd.add(account);
         sub.forEach((subAccountName) {
-          final subAccount = AccountItem(element['rowid'], ' - - $subAccountName');
+          final subAccount = AccountItem(element['rowid'], ' - $subAccountName');
           listToAdd.add(subAccount);
         });
       });
@@ -96,9 +96,11 @@ class AccountsState extends State<Accounts> {
   }
 }
 
+final titleStyle = TextStyle(fontWeight: FontWeight.bold);
+
 Widget createListItem(String name, id, void handler(int itemId)) {
   return ListTile(
-    title: Text(name),
+    title: Text(name, style: id == -1 ? titleStyle : null),
     visualDensity: VisualDensity(vertical:  -4),
     hoverColor: id > -1 ? Colors.blue : null,
     onTap: id == -1 ? null : () {

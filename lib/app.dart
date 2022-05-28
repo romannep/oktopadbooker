@@ -87,6 +87,7 @@ class ScreenController {
   // may be it's overkill, as in PageView every page creates state on activate
   // unless using AutomaticKeepAliveClientMixin
   void Function()? onActivate;
+  Future<void> Function()? onLeave;
 }
 
 class ScreenItem {
@@ -108,14 +109,23 @@ class AppState extends State<App> {
   final List<Widget> buttons = [];
   String title = '';
 
-  back() {
-    animateTo(pageController, pageController.page!.toInt() - 1);
-    processNavigate(pageController.page!.toInt() - 1);
+  back() async {
+    final page = pageController.page!.toInt();
+    if (screens[page].controller.onLeave != null) {
+      print('awaiting leave');
+      await screens[page].controller.onLeave!();
+    }
+    animateTo(pageController, page - 1);
+    processNavigate(page - 1);
   }
 
-  forward() {
-    animateTo(pageController, pageController.page!.toInt() + 1);
-    processNavigate(pageController.page!.toInt() + 1);
+  forward() async {
+    final page = pageController.page!.toInt();
+    if (screens[page].controller.onLeave != null) {
+      await screens[page].controller.onLeave!();
+    }
+    animateTo(pageController, page + 1);
+    processNavigate(page + 1);
   }
 
   processNavigate([newPage = -1]) {
@@ -186,10 +196,11 @@ class AppState extends State<App> {
         }
         case Screen.Account: {
           final key = UniqueKey();
+          final controller = ScreenController();
           final item = ScreenItem(
-            widget: ScreenWrapper(Account(appState: this, key: key, itemId: params?.id)),
+            widget: ScreenWrapper(Account(appState: this, key: key, itemId: params?.id, controller: controller)),
             title: 'Счет',
-            controller: ScreenController(),
+            controller: controller,
           );
           screens.add(item);
           break;

@@ -12,8 +12,14 @@ import '../app.dart';
 class Account extends StatefulWidget {
   final AppState appState;
   final int? itemId;
+  final ScreenController controller;
 
-  Account({ required this.appState, this.itemId, Key? key }): super(key: key);
+  Account({
+    required this.appState,
+    this.itemId,
+    required this.controller,
+    Key? key,
+  }): super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -81,6 +87,7 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
     textNameController = TextEditingController();
     textNameController.addListener(_dataChange);
     itemId = widget.itemId;
+    widget.controller.onLeave = () => _saveData();
     _loadData();
     super.initState();
   }

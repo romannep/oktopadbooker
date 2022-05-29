@@ -30,11 +30,12 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      localizationsDelegates: [
-        GlobalMaterialLocalizations.delegate
-      ],
+      localizationsDelegates:
+        GlobalMaterialLocalizations.delegates
+      ,
       supportedLocales: [
         const Locale('ru'),
+        const Locale('en'),
       ],
       home: App(),
     );

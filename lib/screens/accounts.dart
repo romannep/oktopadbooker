@@ -96,8 +96,6 @@ class AccountsState extends State<Accounts> {
   }
 }
 
-final titleStyle = TextStyle(fontWeight: FontWeight.bold);
-
 Widget createListItem(String name, id, void handler(int itemId)) {
   return ListTile(
     title: Text(name, style: id == -1 ? titleStyle : null),

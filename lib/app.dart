@@ -31,6 +31,8 @@ final marginWidget = SizedBox(
   width: 15,
 );
 
+final titleStyle = TextStyle(fontWeight: FontWeight.bold);
+
 enum Screen {
   Start,
   Accounts,

@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/services.dart';
 import 'package:oktopadbooker/db.dart';
 
 import '../app.dart';
@@ -130,6 +131,10 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
               flex: 1,
               child: TextField(
                 decoration: InputDecoration(labelText: 'Сумма'),
+                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                ],
               ),
             ),
             marginWidget,
@@ -141,10 +146,35 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
             ),
           ],
         ),
-        TextField(
-          decoration: InputDecoration(labelText: 'Название'),
+        marginWidget,marginWidget,
+        Row(
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  Text('Дт', style: titleStyle),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(labelText: 'Счет'),
+                    // value: '1',
+                    items: [
+                      DropdownMenuItem(value: '1', child: Text('One')),
+                      DropdownMenuItem(value: '2', child: Text('Two')),
+                      DropdownMenuItem(value: '4', child: Text('Three')),
+                    ],
+                    onChanged: (value) => {},
+                  ),
+                ],
+                crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+            ),
+            marginWidget,marginWidget,
+            Expanded(
+              child: TextField(
+                decoration: InputDecoration(labelText: 'Название'),
+              ),
+            ),
+          ],
         ),
-        marginWidget,
       ],
     );
 

@@ -26,7 +26,7 @@ class RecordsState extends State<Records> {
   }
 
   newAccount() {
-    appState.navigate(Screen.Account, ScreenParams(newItem: true));
+    appState.navigate(Screen.Record, ScreenParams(newItem: true));
   }
 
   @override

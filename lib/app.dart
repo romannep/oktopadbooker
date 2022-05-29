@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:oktopadupshot/screens/account.dart';
 import 'package:oktopadupshot/screens/accounts.dart';
+import 'package:oktopadupshot/screens/record.dart';
 import 'package:oktopadupshot/screens/records.dart';
 import 'package:oktopadupshot/screens/start.dart';
 
@@ -34,6 +35,7 @@ enum Screen {
   Accounts,
   Account,
   Records,
+  Record,
 }
 
 class ScreenParams {
@@ -210,6 +212,17 @@ class AppState extends State<App> {
             widget: ScreenWrapper(Records(appState: this)),
             title: 'Проводки',
             controller: ScreenController(),
+          );
+          screens.add(item);
+          break;
+        }
+        case Screen.Record: {
+          final key = UniqueKey();
+          final controller = ScreenController();
+          final item = ScreenItem(
+            widget: ScreenWrapper(Record(appState: this, key: key, itemId: params?.id, controller: controller)),
+            title: 'Проводка',
+            controller: controller,
           );
           screens.add(item);
           break;

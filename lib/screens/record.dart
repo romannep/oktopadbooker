@@ -41,6 +41,8 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
 
   late int? itemId;
   DateTime date = DateTime.now();
+  int? dt;
+  int? dtSubIndex;
   // late TextEditingController textNameController;
   // List<String> subAccounts = [];
   // List<TextEditingController> textSubAccountsControllers = [];
@@ -93,7 +95,30 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
     // textNameController.addListener(_dataChange);
     widget.controller.onLeave = () => _saveData();
     _loadData();
+    _loadAccounts();
     super.initState();
+  }
+
+  List<Map<String, dynamic>> _accounts = [];
+  List<String> _dtSubs = [];
+  List<String> _ktSubs = [];
+
+  _loadAccounts() async {
+    final accountsData = await Db.instance.getAccounts();
+    setState(() {
+      _accounts = accountsData;
+    });
+  }
+
+  _updateSubAccounts() {
+    final dtAcc = _accounts.firstWhereOrNull((e) => e['rowid'] == dt);
+
+    setState(() {
+      dtSubIndex = null;
+      if (dtAcc != null && dtSubIndex == null) {
+        _dtSubs = (jsonDecode(dtAcc['sub']) as List<dynamic>).cast<String>();
+      }
+    });
   }
 
   _selectDate(BuildContext context) async {
@@ -153,16 +178,35 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
               child: Column(
                 children: [
                   Text('Дт', style: titleStyle),
-                  DropdownButtonFormField<String>(
+                  DropdownButtonFormField<int>(
                     decoration: InputDecoration(labelText: 'Счет'),
-                    // value: '1',
-                    items: [
-                      DropdownMenuItem(value: '1', child: Text('One')),
-                      DropdownMenuItem(value: '2', child: Text('Two')),
-                      DropdownMenuItem(value: '4', child: Text('Three')),
-                    ],
-                    onChanged: (value) => {},
+                    value: dt,
+                    items: _accounts.map((e) => DropdownMenuItem(
+                      value: e['rowid'] as int,
+                      child: Text(e['name']),
+                    )).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        dt = value;
+                      });
+                      _updateSubAccounts();
+                    },
                   ),
+                  marginWidget,
+                  DropdownButtonFormField<int>(
+                    decoration: InputDecoration(labelText: 'Субсчет'),
+                    value: dtSubIndex,
+                    items: _dtSubs.mapIndexed((index, e) => DropdownMenuItem(
+                      value: index,
+                      child: Text(e),
+                    )).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        dtSubIndex = value;
+                      });
+                    },
+                  ),
+
                 ],
                 crossAxisAlignment: CrossAxisAlignment.start,
               ),

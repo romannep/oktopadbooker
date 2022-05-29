@@ -1,8 +1,8 @@
 import 'dart:io';
-import 'package:oktopadupshot/app.dart';
+import 'package:oktopadbooker/app.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite/sqflite.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 import 'package:flutter/material.dart';
 
@@ -30,6 +30,12 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate
+      ],
+      supportedLocales: [
+        const Locale('ru'),
+      ],
       home: App(),
     );
   }

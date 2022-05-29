@@ -5,9 +5,14 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
-import 'package:oktopadupshot/db.dart';
+import 'package:oktopadbooker/db.dart';
 
 import '../app.dart';
+
+formatDate(DateTime date) {
+  return '${date.day.toString().padLeft(2,'0')}.${date.month.toString().padLeft(2,'0')}.${date.year}';
+}
+
 
 // date, dt, kt, sum, comment
 
@@ -34,6 +39,7 @@ class Record extends StatefulWidget {
 class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Record> {
 
   late int? itemId;
+  DateTime date = DateTime.now();
   // late TextEditingController textNameController;
   // List<String> subAccounts = [];
   // List<TextEditingController> textSubAccountsControllers = [];
@@ -89,12 +95,52 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
     super.initState();
   }
 
+  _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: date,
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2200)
+    );
+    if (picked != null && picked != date) {
+      setState(() {
+        date = picked;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final widget = Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Row(
+          children: [
+            Flexible(
+              flex: 1,
+              child: Row(
+                children: [
+                  Text(formatDate(date.toLocal())),
+                  IconButton(onPressed: () => _selectDate(context), icon: Icon(Icons.calendar_month)),
+                ],
+              ),
+            ),
+            marginWidget,
+            Flexible(
+              flex: 1,
+              child: TextField(
+                decoration: InputDecoration(labelText: 'Сумма'),
+              ),
+            ),
+            marginWidget,
+            Flexible(
+              flex: 3,
+              child: TextField(
+                decoration: InputDecoration(labelText: 'Комментарий'),
+              ),
+            ),
+          ],
+        ),
         TextField(
           decoration: InputDecoration(labelText: 'Название'),
         ),

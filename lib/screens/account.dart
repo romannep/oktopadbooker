@@ -5,7 +5,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
-import 'package:oktopadupshot/db.dart';
+import 'package:oktopadbooker/db.dart';
 
 import '../app.dart';
 

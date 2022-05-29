@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:oktopadupshot/app.dart';
+import 'package:oktopadbooker/app.dart';
 
 class StartScreen extends StatelessWidget {
   final AppState appState;

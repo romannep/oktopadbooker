@@ -2,11 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:oktopadupshot/screens/account.dart';
-import 'package:oktopadupshot/screens/accounts.dart';
-import 'package:oktopadupshot/screens/record.dart';
-import 'package:oktopadupshot/screens/records.dart';
-import 'package:oktopadupshot/screens/start.dart';
+import 'package:oktopadbooker/screens/account.dart';
+import 'package:oktopadbooker/screens/accounts.dart';
+import 'package:oktopadbooker/screens/record.dart';
+import 'package:oktopadbooker/screens/records.dart';
+import 'package:oktopadbooker/screens/start.dart';
 
 import 'db.dart';
 
@@ -28,6 +28,7 @@ Widget createButton(String label, void Function() onPressed) => ElevatedButton(
 
 final marginWidget = SizedBox(
   height: 15,
+  width: 15,
 );
 
 enum Screen {

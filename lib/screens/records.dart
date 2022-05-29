@@ -2,7 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:oktopadupshot/app.dart';
+import 'package:oktopadbooker/app.dart';
 
 class Records extends StatefulWidget {
   final AppState appState;

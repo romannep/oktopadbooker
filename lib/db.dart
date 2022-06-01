@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
+const APP_FOLDER = 'Oktopad Booker';
+const DB_FILENAME = 'booker.db';
+
 class Db {
   static final instance = Db();
 
@@ -11,14 +14,14 @@ class Db {
   init() async {
     Map<String, String> envVars = Platform.environment;
     print('User homedir: ${envVars['UserProfile']}');
-    final path= Directory('${envVars['UserProfile']}/Oktopad Upshot');
+    final path= Directory('${envVars['UserProfile']}/$APP_FOLDER');
     if ((await path.exists())){
       print('Path exist');
     }else{
       await path.create();
       print('Path created');
     }
-    final dbPath = '${envVars['UserProfile']}/Oktopad Upshot/upshot.db';
+    final dbPath = '${envVars['UserProfile']}/$APP_FOLDER/$DB_FILENAME';
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
     db = await openDatabase(
@@ -28,6 +31,9 @@ class Db {
         return () async {
           await db.execute(
             'CREATE TABLE accounts(name TEXT, active INTEGER, sub TEXT)',
+          );
+          await db.execute(
+            'CREATE TABLE records(date TEXT, sum INTEGER, comment TEXT, dt INTEGER, dtsub TEXT, kt INTEGER, ktsub TEXT)',
           );
         }();
       },

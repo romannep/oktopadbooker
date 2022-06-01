@@ -43,6 +43,8 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
   DateTime date = DateTime.now();
   int? dt;
   int? dtSubIndex;
+  int? kt;
+  int? ktSubIndex;
   // late TextEditingController textNameController;
   // List<String> subAccounts = [];
   // List<TextEditingController> textSubAccountsControllers = [];
@@ -110,13 +112,22 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
     });
   }
 
-  _updateSubAccounts() {
+  _updateDtSubAccounts() {
     final dtAcc = _accounts.firstWhereOrNull((e) => e['rowid'] == dt);
-
     setState(() {
       dtSubIndex = null;
       if (dtAcc != null && dtSubIndex == null) {
         _dtSubs = (jsonDecode(dtAcc['sub']) as List<dynamic>).cast<String>();
+      }
+    });
+  }
+
+  _updateKtSubAccounts() {
+    final ktAcc = _accounts.firstWhereOrNull((e) => e['rowid'] == kt);
+    setState(() {
+      ktSubIndex = null;
+      if (ktAcc != null && ktSubIndex == null) {
+        _ktSubs = (jsonDecode(ktAcc['sub']) as List<dynamic>).cast<String>();
       }
     });
   }
@@ -189,7 +200,7 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
                       setState(() {
                         dt = value;
                       });
-                      _updateSubAccounts();
+                      _updateDtSubAccounts();
                     },
                   ),
                   marginWidget,
@@ -213,8 +224,40 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
             ),
             marginWidget,marginWidget,
             Expanded(
-              child: TextField(
-                decoration: InputDecoration(labelText: 'Название'),
+              child: Column(
+                children: [
+                  Text('Кт', style: titleStyle),
+                  DropdownButtonFormField<int>(
+                    decoration: InputDecoration(labelText: 'Счет'),
+                    value: kt,
+                    items: _accounts.map((e) => DropdownMenuItem(
+                      value: e['rowid'] as int,
+                      child: Text(e['name']),
+                    )).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        kt = value;
+                      });
+                      _updateKtSubAccounts();
+                    },
+                  ),
+                  marginWidget,
+                  DropdownButtonFormField<int>(
+                    decoration: InputDecoration(labelText: 'Субсчет'),
+                    value: ktSubIndex,
+                    items: _ktSubs.mapIndexed((index, e) => DropdownMenuItem(
+                      value: index,
+                      child: Text(e),
+                    )).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        ktSubIndex = value;
+                      });
+                    },
+                  ),
+
+                ],
+                crossAxisAlignment: CrossAxisAlignment.start,
               ),
             ),
           ],

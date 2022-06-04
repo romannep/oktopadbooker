@@ -100,7 +100,7 @@ Widget createListItem(String name, id, void handler(int itemId)) {
   return ListTile(
     title: Text(name, style: id == -1 ? titleStyle : null),
     visualDensity: VisualDensity(vertical:  -4),
-    hoverColor: id > -1 ? Colors.blue : null,
+    hoverColor: id > -1 ? PRIMARY_COLOR : null,
     onTap: id == -1 ? null : () {
       print('tap on $id');
       handler(id);

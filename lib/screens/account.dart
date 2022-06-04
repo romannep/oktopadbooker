@@ -40,6 +40,7 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
   List<String> subAccounts = [];
   List<TextEditingController> textSubAccountsControllers = [];
   AccountType type = AccountType.Active;
+  bool hideSubBalance = false;
 
   Timer? _changeTimer;
 
@@ -60,7 +61,8 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
     final newId = await Db.instance.saveAccount(itemId, {
       'name': textNameController.text,
       'active': type == AccountType.Active ? 1 : 0,
-      'sub': jsonEncode(textSubAccountsControllers.map((e) => e.text).toList())
+      'sub': jsonEncode(textSubAccountsControllers.map((e) => e.text).toList()),
+      'hidesubbalance': hideSubBalance ? 1 : 0,
     });
     itemId = newId;
   }
@@ -78,6 +80,7 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
       subAccounts.forEach((element) {
         textSubAccountsControllers.add(TextEditingController(text: element));
       });
+      hideSubBalance = data['hidesubbalance'] == 1;
       print('got sub $subAccounts from ${data['sub']}');
     });
   }
@@ -117,6 +120,12 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
       _dataChange();
     });
   }
+  onHideSubBalanceChange(value) {
+    setState(() {
+      hideSubBalance = value;
+      _dataChange();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +148,19 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
         marginWidget,
         Text('Субсчета'),
         marginWidget,
-        createButton('Добавить', addSubAccount),
+        Row(
+          children: [
+            createButton('Добавить', addSubAccount),
+            marginWidget, marginWidget,
+            Checkbox(
+              checkColor: Colors.white,
+              fillColor: MaterialStateProperty.resolveWith((states) => PRIMARY_COLOR),
+              value: hideSubBalance,
+              onChanged: onHideSubBalanceChange
+            ),
+            Text('Скрывать остатки по субсчетам в отчетах'),
+          ],
+        ),
         marginWidget,
         Expanded(child: SingleChildScrollView(
           child: Column(

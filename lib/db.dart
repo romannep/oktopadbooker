@@ -30,7 +30,7 @@ class Db {
         print('on create');
         return () async {
           await db.execute(
-            'CREATE TABLE accounts(name TEXT, active INTEGER, sub TEXT)',
+            'CREATE TABLE accounts(name TEXT, active INTEGER, sub TEXT, hidesubbalance INTEGER)',
           );
           await db.execute(
             'CREATE TABLE records(date TEXT, sum INTEGER, comment TEXT, dt INTEGER, dtsub TEXT, kt INTEGER, ktsub TEXT)',
@@ -80,31 +80,8 @@ class Db {
   }
 
   Future<Map<String, dynamic>> getAccount(int id) async {
-    final data = await db.query('accounts', columns: ['name', 'active', 'sub'], where: 'rowid = ?', whereArgs: [id]);
+    final data = await db.query('accounts', columns: ['name', 'active', 'sub', 'hidesubbalance'], where: 'rowid = ?', whereArgs: [id]);
     return data[0];
   }
 }
 
-
-class DbAccount {
-  // final int id;
-  final String name;
-  final bool active;
-  final String subAccounts;
-
-  DbAccount({
-    // required this.id,
-    required this.name,
-    required this.active,
-    required this.subAccounts,
-  });
-
-  Map<String, dynamic> toMap() {
-    return {
-      // 'id': id,
-      'name': name,
-      'active': active ? 1 : 0,
-      'sub': subAccounts,
-    };
-  }
-}

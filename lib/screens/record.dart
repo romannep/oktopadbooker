@@ -45,9 +45,8 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
   int? dtSubIndex;
   int? kt;
   int? ktSubIndex;
-  // late TextEditingController textNameController;
-  // List<String> subAccounts = [];
-  // List<TextEditingController> textSubAccountsControllers = [];
+  late TextEditingController textCommentController;
+  late TextEditingController textSumController;
 
   Timer? _changeTimer;
 
@@ -59,18 +58,22 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
     _changeTimer = new Timer(Duration(milliseconds: DEBOUNCE_TIMEOUT_MS), _saveData);
   }
 
-  _saveData() async {
+  Future<void> _saveData() async {
     if (_changeTimer != null) {
       _changeTimer!.cancel();
       _changeTimer = null;
     }
 
-    // final newId = await Db.instance.saveAccount(itemId, {
-    //   'name': textNameController.text,
-    //   'active': type == AccountType.Active ? 1 : 0,
-    //   'sub': jsonEncode(textSubAccountsControllers.map((e) => e.text).toList())
-    // });
-    // itemId = newId;
+    final newId = await Db.instance.saveRecord(itemId, {
+      'date': date.toIso8601String(),
+      'sum':  int.parse(textSumController.text),
+      'comment': textCommentController.text,
+      'dt': dt,
+      'dtsub': (dtSubIndex ?? -1) > -1 ? _dtSubs[dtSubIndex!] : '',
+      'kt': kt,
+      'ktsub': (ktSubIndex ?? -1) > -1 ? _ktSubs[ktSubIndex!] : '',
+    });
+    itemId = newId;
   }
 
   _loadData() async {
@@ -93,9 +96,11 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
   @override
   void initState() {
     itemId = widget.itemId;
-    // textNameController = TextEditingController();
-    // textNameController.addListener(_dataChange);
-    widget.controller.onLeave = () => _saveData();
+    textCommentController = TextEditingController();
+    textSumController = TextEditingController();
+    textCommentController.addListener(_dataChange);
+    textSumController.addListener(_dataChange);
+    widget.controller.onLeave = _saveData;
     _loadData();
     _loadAccounts();
     super.initState();
@@ -166,6 +171,7 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
             Flexible(
               flex: 1,
               child: TextField(
+                controller: textSumController,
                 decoration: InputDecoration(labelText: 'Сумма'),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
@@ -177,6 +183,7 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
             Flexible(
               flex: 3,
               child: TextField(
+                controller: textCommentController,
                 decoration: InputDecoration(labelText: 'Комментарий'),
               ),
             ),
@@ -201,6 +208,7 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
                         dt = value;
                       });
                       _updateDtSubAccounts();
+                      _dataChange();
                     },
                   ),
                   marginWidget,
@@ -215,6 +223,7 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
                       setState(() {
                         dtSubIndex = value;
                       });
+                      _dataChange();
                     },
                   ),
 
@@ -239,6 +248,7 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
                         kt = value;
                       });
                       _updateKtSubAccounts();
+                      _dataChange();
                     },
                   ),
                   marginWidget,
@@ -253,6 +263,7 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
                       setState(() {
                         ktSubIndex = value;
                       });
+                      _dataChange();
                     },
                   ),
 

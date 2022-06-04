@@ -52,7 +52,7 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
     _changeTimer = new Timer(Duration(milliseconds: DEBOUNCE_TIMEOUT_MS), _saveData);
   }
 
-  _saveData() async {
+  Future<void> _saveData() async {
     if (_changeTimer != null) {
       _changeTimer!.cancel();
       _changeTimer = null;
@@ -90,7 +90,7 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
     textNameController = TextEditingController();
     textNameController.addListener(_dataChange);
     itemId = widget.itemId;
-    widget.controller.onLeave = () => _saveData();
+    widget.controller.onLeave = _saveData;
     _loadData();
     super.initState();
   }

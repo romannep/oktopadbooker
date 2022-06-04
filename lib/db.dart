@@ -83,5 +83,36 @@ class Db {
     final data = await db.query('accounts', columns: ['name', 'active', 'sub', 'hidesubbalance'], where: 'rowid = ?', whereArgs: [id]);
     return data[0];
   }
+
+  Future<int> saveRecord(int? id, Map<String, dynamic> record) async {
+    print('db saving $record');
+    if (id == null) {
+      final newId = await db.insert(
+        'records',
+        record,
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      print('inserted to $newId');
+      return newId;
+    } else {
+      await db.update(
+        'records',
+        record,
+        where: 'rowid = ?',
+        whereArgs: [id],
+      );
+      print('updated to $id');
+      return id;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getRecords() async {
+    return db.query('records', columns: ['date', 'sum', 'comment', 'dt', 'dtsub', 'kt', 'ktsub'], orderBy: 'date DESC');
+  }
+
+  Future<Map<String, dynamic>> getRecord(int id) async {
+    final data = await db.query('records', columns: ['date', 'sum', 'comment', 'dt', 'dtsub', 'kt', 'ktsub'], where: 'rowid = ?', whereArgs: [id]);
+    return data[0];
+  }
 }
 

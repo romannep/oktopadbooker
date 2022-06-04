@@ -81,12 +81,29 @@ class AccountsState extends State<Accounts> {
         createButton('Добавить новый счет', newAccount),
         marginWidget,
         Expanded(
-          child: ListView(
+          child: Row(
             children: [
-              createListItem('Активные', -1, openAccount),
-              ...actives,
-              createListItem('Пассивные', -1, openAccount),
-              ...passives,
+              Expanded(child: Column(
+                children: [
+                  Text('Активные', style: titleStyle),
+                  Expanded(child: ListView(
+                    children: [
+                      ...actives,
+                    ],
+                  )),
+                ],
+              )),
+              marginWidget, marginWidget,
+              Expanded(child: Column(
+                children: [
+                  Text('Пассивные', style: titleStyle),
+                  Expanded(child: ListView(
+                    children: [
+                      ...passives,
+                    ],
+                  )),
+                ],
+              )),
             ],
           ),
         ),

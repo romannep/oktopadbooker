@@ -35,6 +35,9 @@ class Db {
           await db.execute(
             'CREATE TABLE records(date TEXT, sum INTEGER, comment TEXT, dt INTEGER, dtsub TEXT, kt INTEGER, ktsub TEXT)',
           );
+          await db.execute(
+            'CREATE TABLE flows(record INTEGER, date TEXT, account INTEGER, sub TEXT, dt INTEGER, kt INTEGER)',
+          );
         }();
       },
       onUpgrade: (db, oldVersion, newVersion) {
@@ -86,14 +89,14 @@ class Db {
 
   Future<int> saveRecord(int? id, Map<String, dynamic> record) async {
     print('db saving $record');
+    int newId = 0;
     if (id == null) {
-      final newId = await db.insert(
+      newId = await db.insert(
         'records',
         record,
         conflictAlgorithm: ConflictAlgorithm.replace,
       );
       print('inserted to $newId');
-      return newId;
     } else {
       await db.update(
         'records',
@@ -102,8 +105,21 @@ class Db {
         whereArgs: [id],
       );
       print('updated to $id');
-      return id;
+      newId = id;
     }
+
+    db.delete('flows', where: 'account = ?', whereArgs: [newId]);
+    newId = await db.insert(
+      'flows',
+      {
+        'record': newId,
+        'date': record['date'],
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+    // one more for kt
+
+    return newId;
   }
 
   Future<List<Map<String, dynamic>>> getRecords() async {

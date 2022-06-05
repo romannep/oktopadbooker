@@ -107,7 +107,7 @@ class Db {
   }
 
   Future<List<Map<String, dynamic>>> getRecords() async {
-    return db.rawQuery('SELECT r.date, r.sum, r.comment, dtsub, ktsub, a.name as dtname, b.name as ktname FROM records r LEFT JOIN accounts a ON r.dt = a.rowid LEFT JOIN accounts b ON r.kt = b.rowid');
+    return db.rawQuery('SELECT r.rowid, r.date, r.sum, r.comment, dtsub, ktsub, a.name as dtname, b.name as ktname FROM records r LEFT JOIN accounts a ON r.dt = a.rowid LEFT JOIN accounts b ON r.kt = b.rowid ORDER BY r.date DESC');
   }
 
   Future<Map<String, dynamic>> getRecord(int id) async {

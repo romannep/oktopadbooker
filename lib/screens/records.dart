@@ -42,12 +42,11 @@ class RecordsState extends State<Records> {
       records.clear();
       data.forEach((element) {
         records.add(DataRow(
+          onSelectChanged: (_) => openRecord(element['rowid']),
           cells: [
             createCell(formatDate(DateTime.parse(element['date']))),
-            createCell((element['dtname'] ?? '') + '\n bla bla'),
-            createCell(element['dtsub'] ?? ''),
-            createCell(element['ktname'] ?? ''),
-            createCell(element['ktsub'] ?? ''),
+            createCell('${(element['dtname'] ?? '')}${(element['dtsub'] ?? '') == '' ? '' : '\n[${element['dtsub']}]'}'),
+            createCell('${(element['ktname'] ?? '')}${(element['ktsub'] ?? '') == '' ? '' : '\n[${element['ktsub']}]'}'),
             createCell((element['sum'] as int).toString()),
             createCell(element['comment'] ?? ''),
           ],
@@ -56,8 +55,8 @@ class RecordsState extends State<Records> {
     });
   }
 
-  openAccount() {
-    appState.navigate(Screen.Account);
+  openRecord(int id) {
+    appState.navigate(Screen.Record, ScreenParams(id: id));
   }
 
   newAccount() {
@@ -78,12 +77,11 @@ class RecordsState extends State<Records> {
             controller: scrollController,
             scrollDirection: Axis.horizontal,
             child: SingleChildScrollView(child: DataTable(
+              showCheckboxColumn: false,
               columns: [
                 DataColumn(label: Text('Дата', style: titleStyle)),
                 DataColumn(label: Text('Дт', style: titleStyle)),
-                DataColumn(label: Text('суб', style: titleStyle)),
                 DataColumn(label: Text('Кт', style: titleStyle)),
-                DataColumn(label: Text('суб', style: titleStyle)),
                 DataColumn(label: Text('Сумма', style: titleStyle)),
                 DataColumn(label: Text('Комментарий', style: titleStyle)),
               ],

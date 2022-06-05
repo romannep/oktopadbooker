@@ -80,17 +80,20 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
     if (itemId == null) {
       return;
     }
-    // final data = await Db.instance.getAccount(itemId!);
-    // setState(() {
-    //   textNameController.text = data['name'];
-    //   type = data['active'] == 1 ? AccountType.Active : AccountType.Passive;
-    //   subAccounts = (jsonDecode(data['sub']) as List<dynamic>).cast<String>();
-    //   textSubAccountsControllers.clear();
-    //   subAccounts.forEach((element) {
-    //     textSubAccountsControllers.add(TextEditingController(text: element));
-    //   });
-    //   print('got sub $subAccounts from ${data['sub']}');
-    // });
+    final data = await Db.instance.getRecord(itemId!);
+    setState(() {
+      textSumController.text = (data['sum'] as int).toString();
+      textCommentController.text = data['comment'];
+      dt = data['dt'] ?? -1;
+      kt = data['kt'] ?? -1;
+      if (dt! > -1) {
+        _updateDtSubAccounts(data['dtsub'] ?? '');
+      }
+      if (kt! > -1) {
+        _updateKtSubAccounts(data['ktsub'] ?? '');
+      }
+      date = DateTime.parse(data['date']);
+    });
   }
 
   @override
@@ -101,9 +104,13 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
     textCommentController.addListener(_dataChange);
     textSumController.addListener(_dataChange);
     widget.controller.onLeave = _saveData;
-    _loadData();
-    _loadAccounts();
+    asyncInit();
     super.initState();
+  }
+
+  asyncInit() async {
+    await _loadAccounts();
+    await _loadData();
   }
 
   List<Map<String, dynamic>> _accounts = [];
@@ -117,22 +124,34 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
     });
   }
 
-  _updateDtSubAccounts() {
+  _updateDtSubAccounts([String sub = '']) {
     final dtAcc = _accounts.firstWhereOrNull((e) => e['rowid'] == dt);
     setState(() {
       dtSubIndex = null;
       if (dtAcc != null && dtSubIndex == null) {
         _dtSubs = (jsonDecode(dtAcc['sub']) as List<dynamic>).cast<String>();
+        if (sub != '') {
+          final index = _dtSubs.indexWhere((element) => element == sub);
+          if (index > -1) {
+            dtSubIndex = index;
+          }
+        }
       }
     });
   }
 
-  _updateKtSubAccounts() {
+  _updateKtSubAccounts([String sub = '']) {
     final ktAcc = _accounts.firstWhereOrNull((e) => e['rowid'] == kt);
     setState(() {
       ktSubIndex = null;
       if (ktAcc != null && ktSubIndex == null) {
         _ktSubs = (jsonDecode(ktAcc['sub']) as List<dynamic>).cast<String>();
+        if (sub != '') {
+          final index = _ktSubs.indexWhere((element) => element == sub);
+          if (index > -1) {
+            ktSubIndex = index;
+          }
+        }
       }
     });
   }

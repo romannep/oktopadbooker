@@ -66,7 +66,7 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
 
     final newId = await Db.instance.saveRecord(itemId, {
       'date': date.toIso8601String(),
-      'sum':  int.parse(textSumController.text),
+      'sum':  int.parse(textSumController.text == '' ? '0' : textSumController.text),
       'comment': textCommentController.text,
       'dt': dt,
       'dtsub': (dtSubIndex ?? -1) > -1 ? _dtSubs[dtSubIndex!] : '',

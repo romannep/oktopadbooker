@@ -46,7 +46,7 @@ final marginWidget = SizedBox(
   width: 15,
 );
 
-final titleStyle = TextStyle(fontWeight: FontWeight.bold);
+const titleStyle = TextStyle(fontWeight: FontWeight.bold);
 
 enum Screen {
   Start,
@@ -89,6 +89,7 @@ class ScreenWrapper extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
+            // decoration: BoxDecoration(border: Border.all()),
             constraints: BoxConstraints(
               minHeight: 0,
               maxHeight:  435,

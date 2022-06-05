@@ -3,6 +3,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:oktopadbooker/app.dart';
+import 'package:oktopadbooker/screens/record.dart';
+
+import '../db.dart';
 
 class Records extends StatefulWidget {
   final AppState appState;
@@ -16,10 +19,42 @@ class Records extends StatefulWidget {
 
 }
 
+DataCell createCell (String text, [TextStyle? style= null]) =>
+    DataCell(Text(text, style: style));
+
+
 class RecordsState extends State<Records> {
   final AppState appState;
 
   RecordsState({ required this.appState });
+
+  final List<DataRow> records = [];
+
+  @override
+  initState() {
+    onActivate();
+  }
+
+  onActivate() async {
+    final data = await Db.instance.getRecords();
+    // print('got records $data');
+    setState(() {
+      records.clear();
+      data.forEach((element) {
+        records.add(DataRow(
+          cells: [
+            createCell(formatDate(DateTime.parse(element['date']))),
+            createCell((element['dtname'] ?? '') + '\n bla bla'),
+            createCell(element['dtsub'] ?? ''),
+            createCell(element['ktname'] ?? ''),
+            createCell(element['ktsub'] ?? ''),
+            createCell((element['sum'] as int).toString()),
+            createCell(element['comment'] ?? ''),
+          ],
+        ));
+      });
+    });
+  }
 
   openAccount() {
     appState.navigate(Screen.Account);
@@ -29,6 +64,8 @@ class RecordsState extends State<Records> {
     appState.navigate(Screen.Record, ScreenParams(newItem: true));
   }
 
+  final scrollController = ScrollController();
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -37,18 +74,23 @@ class RecordsState extends State<Records> {
         createButton('Добавить новую проводку', newAccount),
         marginWidget,
         Expanded(
-          child: ListView(
-            children: [
-              Text('acc 1'),
-              Text('acc 2'),
-              Container(
-                child: Text('acc 3'),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.black),
-                ),
-              ),
-            ],
-          ),
+          child: Scrollbar(controller: scrollController, isAlwaysShown: true, child: SingleChildScrollView(
+            controller: scrollController,
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(child: DataTable(
+              columns: [
+                DataColumn(label: Text('Дата', style: titleStyle)),
+                DataColumn(label: Text('Дт', style: titleStyle)),
+                DataColumn(label: Text('суб', style: titleStyle)),
+                DataColumn(label: Text('Кт', style: titleStyle)),
+                DataColumn(label: Text('суб', style: titleStyle)),
+                DataColumn(label: Text('Сумма', style: titleStyle)),
+                DataColumn(label: Text('Комментарий', style: titleStyle)),
+              ],
+              // defaultColumnWidth: const IntrinsicColumnWidth(),
+              rows: records,
+            )),
+          )),
         ),
       ],
     );

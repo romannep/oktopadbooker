@@ -101,8 +101,6 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
     itemId = widget.itemId;
     textCommentController = TextEditingController();
     textSumController = TextEditingController();
-    textCommentController.addListener(_dataChange);
-    textSumController.addListener(_dataChange);
     widget.controller.onLeave = _saveData;
     asyncInit();
     super.initState();
@@ -111,6 +109,8 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
   asyncInit() async {
     await _loadAccounts();
     await _loadData();
+    textCommentController.addListener(_dataChange);
+    textSumController.addListener(_dataChange);
   }
 
   List<Map<String, dynamic>> _accounts = [];
@@ -166,6 +166,7 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
     if (picked != null && picked != date) {
       setState(() {
         date = picked;
+        _dataChange();
       });
     }
   }

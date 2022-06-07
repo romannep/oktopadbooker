@@ -36,7 +36,7 @@ class Db {
             'CREATE TABLE records(date TEXT, sum INTEGER, comment TEXT, dt INTEGER, dtsub TEXT, kt INTEGER, ktsub TEXT)',
           );
           await db.execute(
-            'CREATE TABLE flows(record INTEGER, date TEXT, account INTEGER, sub TEXT, dt INTEGER, kt INTEGER)',
+            'CREATE TABLE flows(record INTEGER, date TEXT, account INTEGER, sub TEXT, do INTEGER, ko INTEGER)',
           );
         }();
       },
@@ -108,17 +108,31 @@ class Db {
       newId = id;
     }
 
-    db.delete('flows', where: 'account = ?', whereArgs: [newId]);
-    newId = await db.insert(
+    await db.delete('flows', where: 'record = ?', whereArgs: [newId]);
+    await db.insert(
       'flows',
       {
         'record': newId,
         'date': record['date'],
+        'account': record['dt'],
+        'sub': record['dtsub'],
+        'do': record['sum'],
+        'ko': 0,
       },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
-    // one more for kt
-
+    await db.insert(
+      'flows',
+      {
+        'record': newId,
+        'date': record['date'],
+        'account': record['kt'],
+        'sub': record['ktsub'],
+        'do': 0,
+        'ko': record['sum'],
+      },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
     return newId;
   }
 
@@ -129,6 +143,16 @@ class Db {
   Future<Map<String, dynamic>> getRecord(int id) async {
     final data = await db.query('records', columns: ['date', 'sum', 'comment', 'dt', 'dtsub', 'kt', 'ktsub'], where: 'rowid = ?', whereArgs: [id]);
     return data[0];
+  }
+
+  Future<List<Map<String, dynamic>>> getBalance(DateTime date) async {
+    final data = await db.query('flows');
+    return data;
+  }
+
+  Future<List<Map<String, dynamic>>> getFlows(DateTime startDate, DateTime endDate) async {
+    final data = await db.query('flows');
+    return data;
   }
 }
 

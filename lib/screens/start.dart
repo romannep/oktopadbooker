@@ -14,7 +14,7 @@ class StartScreen extends StatelessWidget {
   }
 
   seeResults() {
-    appState.navigate(null);
+    appState.navigate(Screen.Report);
   }
 
   setupAccounts() {

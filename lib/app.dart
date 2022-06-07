@@ -6,6 +6,7 @@ import 'package:oktopadbooker/screens/account.dart';
 import 'package:oktopadbooker/screens/accounts.dart';
 import 'package:oktopadbooker/screens/record.dart';
 import 'package:oktopadbooker/screens/records.dart';
+import 'package:oktopadbooker/screens/report.dart';
 import 'package:oktopadbooker/screens/start.dart';
 
 import 'db.dart';
@@ -54,6 +55,7 @@ enum Screen {
   Account,
   Records,
   Record,
+  Report,
 }
 
 class ScreenParams {
@@ -242,6 +244,15 @@ class AppState extends State<App> {
             widget: ScreenWrapper(Record(appState: this, key: key, itemId: params?.id, controller: controller)),
             title: 'Проводка',
             controller: controller,
+          );
+          screens.add(item);
+          break;
+        }
+        case Screen.Report: {
+          final item = ScreenItem(
+            widget: ScreenWrapper(Report(appState: this)),
+            title: 'Результат',
+            controller: ScreenController(),
           );
           screens.add(item);
           break;

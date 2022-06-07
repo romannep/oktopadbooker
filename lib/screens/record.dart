@@ -84,12 +84,12 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
     setState(() {
       textSumController.text = (data['sum'] as int).toString();
       textCommentController.text = data['comment'];
-      dt = data['dt'] ?? -1;
-      kt = data['kt'] ?? -1;
-      if (dt! > -1) {
+      dt = data['dt'];
+      kt = data['kt'];
+      if (dt != null) {
         _updateDtSubAccounts(data['dtsub'] ?? '');
       }
-      if (kt! > -1) {
+      if (kt != null) {
         _updateKtSubAccounts(data['ktsub'] ?? '');
       }
       date = DateTime.parse(data['date']);

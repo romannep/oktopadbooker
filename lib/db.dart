@@ -109,30 +109,33 @@ class Db {
     }
 
     await db.delete('flows', where: 'record = ?', whereArgs: [newId]);
-    await db.insert(
-      'flows',
-      {
-        'record': newId,
-        'date': record['date'],
-        'account': record['dt'],
-        'sub': record['dtsub'],
-        'do': record['sum'],
-        'ko': 0,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-    await db.insert(
-      'flows',
-      {
-        'record': newId,
-        'date': record['date'],
-        'account': record['kt'],
-        'sub': record['ktsub'],
-        'do': 0,
-        'ko': record['sum'],
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+
+    if (record['dt'] != null && record['dt'] > 0 && record['kt'] != null && record['kt'] > 0) {
+      await db.insert(
+        'flows',
+        {
+          'record': newId,
+          'date': record['date'],
+          'account': record['dt'],
+          'sub': record['dtsub'],
+          'do': record['sum'],
+          'ko': 0,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+      await db.insert(
+        'flows',
+        {
+          'record': newId,
+          'date': record['date'],
+          'account': record['kt'],
+          'sub': record['ktsub'],
+          'do': 0,
+          'ko': record['sum'],
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+    }
     return newId;
   }
 

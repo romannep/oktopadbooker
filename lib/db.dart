@@ -153,7 +153,7 @@ class Db {
     if (startDate == null) {
       data = await db.rawQuery('SELECT account, sub, SUM(do), SUM(ko) FROM flows WHERE date < ? GROUP BY account, sub', [date.toIso8601String()]);
     } else {
-      data = await db.rawQuery('SELECT account, sub, SUM(do), SUM(ko) FROM flows WHERE date < ? AND date > ? GROUP BY account, sub', [date.toIso8601String(), startDate.toIso8601String()]);
+      data = await db.rawQuery('SELECT account, sub, SUM(do), SUM(ko) FROM flows WHERE date < ? AND date >= ? GROUP BY account, sub', [date.toIso8601String(), startDate.toIso8601String()]);
     }
     return data;
   }

@@ -80,18 +80,49 @@ class ReportState extends State<Report> {
 
     data.sort((a, b) => (a.active == b.active ? 0 : (a.active ? -1 : 1)));
 
+    flows.forEach((flow) {
+      final row = data.firstWhere((element) => element.accountId == flow['account'] && (flow['sub'] == '' || flow['sub'] == element.account));
+      row.dto = flow['SUM(do)'];
+      row.kto = flow['SUM(ko)'];
+      if (row.isSubAccount) {
+        final parent = data.firstWhere((element) => element.accountId == row.accountId && element.isSubAccount == false);
+        parent.dto = (parent.dto ?? 0) + row.dto!;
+        parent.kto = (parent.kto ?? 0) + row.kto!;
+      }
+    });
+
+    saldo.forEach((item) {
+      final row = data.firstWhere((element) => element.accountId == item['account'] && (item['sub'] == '' || item['sub'] == element.account));
+      int result = item['SUM(do)'] - item['SUM(ko)'];
+      if (row.active) {
+        row.snd = result;
+      } else {
+        row.snk = -result;
+      }
+
+      if (row.isSubAccount) {
+        final parent = data.firstWhere((element) => element.accountId == row.accountId && element.isSubAccount == false);
+        if (row.active) {
+          parent.snd = (parent.snd ?? 0) + result;
+        } else {
+          parent.snk = (parent.snk ?? 0) - result;
+        }
+      }
+    });
+
     setState(() {
       reportData.clear();
       data.forEachIndexed((index, element) {
+        final style = data[index].isSubAccount ? null : titleStyle;
         reportData.add(DataRow(
           cells: [
-            createCell('${data[index].isSubAccount ? '- ' : ''}${data[index].account}'),
-            createCell(''),
-            createCell(''),
-            createCell(''),
-            createCell(''),
-            createCell(''),
-            createCell(''),
+            createCell('${data[index].isSubAccount ? '- ' : ''}${data[index].account}', style),
+            createCell('${data[index].snd ?? ''}', style),
+            createCell('${data[index].snk ?? ''}', style),
+            createCell('${data[index].dto ?? ''}', style),
+            createCell('${data[index].kto ?? ''}', style),
+            createCell('${data[index].skd ?? ''}', style),
+            createCell('${data[index].skk ?? ''}', style),
           ],
         ));
       });

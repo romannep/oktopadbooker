@@ -250,7 +250,8 @@ class AppState extends State<App> {
         }
         case Screen.Report: {
           final item = ScreenItem(
-            widget: ScreenWrapper(Report(appState: this)),
+            // widget: Center(child: Row( children: [Report(appState: this)], mainAxisAlignment: MainAxisAlignment.center)),
+            widget: Report(appState: this),
             title: 'Результат',
             controller: ScreenController(),
           );

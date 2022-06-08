@@ -1,7 +1,10 @@
 
 
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 import 'package:oktopadbooker/app.dart';
 import 'package:oktopadbooker/screens/record.dart';
 
@@ -28,6 +31,22 @@ DateTime endOfDay(DateTime date) => DateTime(date.year, date.month, date.day +1)
 DateTime startOfMonth(DateTime date) => DateTime(date.year, date.month, 1);
 DateTime endOfMont(DateTime date) => DateTime(date.year, date.month + 1, 0).add(Duration(days: 1)).subtract(Duration(milliseconds: 1));
 
+class ReportRow {
+  String account;
+  int accountId;
+  bool active;
+  bool isSubAccount;
+
+  int? snd;
+  int? snk;
+  int? dto;
+  int? kto;
+  int? skd;
+  int? skk;
+
+  ReportRow(this.accountId, this.account, this.active, this.isSubAccount);
+}
+
 
 class ReportState extends State<Report> {
   final AppState appState;
@@ -50,21 +69,33 @@ class ReportState extends State<Report> {
     final flows = await Db.instance.getSumFlows(endDate, startDate);
     print('got saldo $saldo');
     print('got flows $flows');
-    // setState(() {
-    //   records.clear();
-    //   data.forEach((element) {
-    //     records.add(DataRow(
-    //       onSelectChanged: (_) => openRecord(element['rowid']),
-    //       cells: [
-    //         createCell(formatDate(DateTime.parse(element['date']))),
-    //         createCell('${(element['dtname'] ?? '')}${(element['dtsub'] ?? '') == '' ? '' : '\n[${element['dtsub']}]'}'),
-    //         createCell('${(element['ktname'] ?? '')}${(element['ktsub'] ?? '') == '' ? '' : '\n[${element['ktsub']}]'}'),
-    //         createCell((element['sum'] as int).toString()),
-    //         createCell(element['comment'] ?? ''),
-    //       ],
-    //     ));
-    //   });
-    // });
+
+    final List<ReportRow> data = [];
+    final accountsData = await Db.instance.getAccounts();
+    accountsData.forEach((element) {
+      data.add(ReportRow(element['rowid'], element['name'], element['active'] == 1, false));
+      final sub = (jsonDecode(element['sub']) as List<dynamic>).cast<String>();
+      sub.forEach((subName) => data.add(ReportRow(element['rowid'], subName, element['active'] == 1, true)));
+    });
+
+    data.sort((a, b) => (a.active == b.active ? 0 : (a.active ? -1 : 1)));
+
+    setState(() {
+      reportData.clear();
+      data.forEachIndexed((index, element) {
+        reportData.add(DataRow(
+          cells: [
+            createCell('${data[index].isSubAccount ? '- ' : ''}${data[index].account}'),
+            createCell(''),
+            createCell(''),
+            createCell(''),
+            createCell(''),
+            createCell(''),
+            createCell(''),
+          ],
+        ));
+      });
+    });
   }
 
   openRecord(int id) {
@@ -99,9 +130,12 @@ class ReportState extends State<Report> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      // crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        marginWidget,
+        marginWidget,
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             Text('Период с:'),
             marginWidget,
@@ -122,11 +156,13 @@ class ReportState extends State<Report> {
             child: SingleChildScrollView(child: DataTable(
               showCheckboxColumn: false,
               columns: [
-                DataColumn(label: Text('Дата', style: titleStyle)),
-                DataColumn(label: Text('Дт', style: titleStyle)),
-                DataColumn(label: Text('Кт', style: titleStyle)),
-                DataColumn(label: Text('Сумма', style: titleStyle)),
-                DataColumn(label: Text('Комментарий', style: titleStyle)),
+                DataColumn(label: Text('Счет', style: titleStyle)),
+                DataColumn(label: Text('СНД', style: titleStyle)),
+                DataColumn(label: Text('СНК', style: titleStyle)),
+                DataColumn(label: Text('ДО', style: titleStyle)),
+                DataColumn(label: Text('КО', style: titleStyle)),
+                DataColumn(label: Text('СКД', style: titleStyle)),
+                DataColumn(label: Text('СКК', style: titleStyle)),
               ],
               // defaultColumnWidth: const IntrinsicColumnWidth(),
               rows: reportData,

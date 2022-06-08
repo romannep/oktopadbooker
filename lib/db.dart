@@ -148,8 +148,13 @@ class Db {
     return data[0];
   }
 
-  Future<List<Map<String, dynamic>>> getBalance(DateTime date) async {
-    final data = await db.query('flows');
+  Future<List<Map<String, dynamic>>> getSumFlows(DateTime date, [DateTime? startDate]) async {
+    List<Map<String, dynamic>> data;
+    if (startDate == null) {
+      data = await db.rawQuery('SELECT account, sub, SUM(do), SUM(ko) FROM flows WHERE date < ? GROUP BY account, sub', [date.toIso8601String()]);
+    } else {
+      data = await db.rawQuery('SELECT account, sub, SUM(do), SUM(ko) FROM flows WHERE date < ? AND date > ? GROUP BY account, sub', [date.toIso8601String(), startDate.toIso8601String()]);
+    }
     return data;
   }
 

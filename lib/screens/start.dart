@@ -26,9 +26,9 @@ class StartScreen extends StatelessWidget {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        createButton('Добавить или изменить проводки', changeData),
-        marginWidget,
         createButton('Посмотреть результаты', seeResults),
+        marginWidget,
+        createButton('Добавить или изменить проводки', changeData),
         marginWidget,
         createButton('Настроить счета', setupAccounts),
       ],

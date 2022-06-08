@@ -24,7 +24,10 @@ DataCell createCell (String text, [TextStyle? style= null]) =>
 
 
 DateTime startOfDay(DateTime date) => DateTime(date.year, date.month, date.day);
-DateTime endOfDay(DateTime date) => DateTime(date.year, date.month, date.day, 23, 59, 999);
+DateTime endOfDay(DateTime date) => DateTime(date.year, date.month, date.day +1).subtract(Duration(milliseconds: 1));
+DateTime startOfMonth(DateTime date) => DateTime(date.year, date.month, 1);
+DateTime endOfMont(DateTime date) => DateTime(date.year, date.month + 1, 0).add(Duration(days: 1)).subtract(Duration(milliseconds: 1));
+
 
 class ReportState extends State<Report> {
   final AppState appState;
@@ -37,14 +40,16 @@ class ReportState extends State<Report> {
 
   @override
   initState() {
-    startDate = startOfDay(startDate);
-    endDate = endOfDay(endDate);
-    onActivate();
+    startDate = startOfMonth(startDate);
+    endDate = endOfMont(endDate);
+    formReport();
   }
 
-  onActivate() async {
-    final data = await Db.instance.getBalance(startDate);
-    print('got records $data');
+  formReport() async {
+    final saldo = await Db.instance.getSumFlows(startDate);
+    final flows = await Db.instance.getSumFlows(endDate, startDate);
+    print('got saldo $saldo');
+    print('got flows $flows');
     // setState(() {
     //   records.clear();
     //   data.forEach((element) {
@@ -70,6 +75,25 @@ class ReportState extends State<Report> {
     appState.navigate(Screen.Record, ScreenParams(newItem: true));
   }
 
+  _selectDate(BuildContext context, bool setStartDate) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: (setStartDate ? startDate : endDate),
+        firstDate: DateTime(1900),
+        lastDate: DateTime(2200)
+    );
+    if (picked != null && picked != (setStartDate ? startDate : endDate)) {
+      setState(() {
+        if (setStartDate) {
+          startDate = picked;
+        } else {
+          endDate = picked;
+        }
+        formReport();
+      });
+    }
+  }
+
   final scrollController = ScrollController();
 
   @override
@@ -77,7 +101,19 @@ class ReportState extends State<Report> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        createButton('Добавить новую проводку', newAccount),
+        Row(
+          children: [
+            Text('Период с:'),
+            marginWidget,
+            Text(formatDate(startDate.toLocal())),
+            IconButton(onPressed: () => _selectDate(context, true), icon: Icon(Icons.calendar_month)),
+            marginWidget,
+            Text('по:'),
+            marginWidget,
+            Text(formatDate(endDate.toLocal())),
+            IconButton(onPressed: () => _selectDate(context, false), icon: Icon(Icons.calendar_month)),
+          ],
+        ),
         marginWidget,
         Expanded(
           child: Scrollbar(controller: scrollController, isAlwaysShown: true, child: SingleChildScrollView(

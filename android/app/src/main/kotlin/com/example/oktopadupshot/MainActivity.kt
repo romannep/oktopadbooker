@@ -1,4 +1,4 @@
-package com.example.oktopadupshot
+package com.example.oktopadbooker
 
 import io.flutter.embedding.android.FlutterActivity
 

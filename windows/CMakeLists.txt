@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
-project(oktopadupshot LANGUAGES CXX)
+project(oktopadbooker LANGUAGES CXX)
 
-set(BINARY_NAME "oktopadupshot")
+set(BINARY_NAME "OktopadBooker")
 
 cmake_policy(SET CMP0063 NEW)
 

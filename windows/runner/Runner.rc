@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "oktopadupshot" "\0"
+            VALUE "CompanyName", "Roman Nep" "\0"
+            VALUE "FileDescription", "Oktopad Booker" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "oktopadupshot" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2022 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "oktopadupshot.exe" "\0"
-            VALUE "ProductName", "oktopadupshot" "\0"
+            VALUE "InternalName", "Oktopad Booker" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2022 Roman Nep <neproman@gmail.com>. All rights reserved." "\0"
+            VALUE "OriginalFilename", "OktopadBooker.exe" "\0"
+            VALUE "ProductName", "Oktopad Booker" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

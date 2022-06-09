@@ -94,13 +94,13 @@ class ReportState extends State<Report> {
     saldo.forEach((item) {
       final row = data.firstWhere((element) => element.accountId == item['account'] && (item['sub'] == '' || item['sub'] == element.account));
       int result = item['SUM(do)'] - item['SUM(ko)'];
-      if (row.active) {
+      if (row.active && result != 0) {
         row.snd = result;
-      } else {
+      } else if (result != 0) {
         row.snk = -result;
       }
 
-      if (row.isSubAccount) {
+      if (row.isSubAccount && result != 0) {
         final parent = data.firstWhere((element) => element.accountId == row.accountId && element.isSubAccount == false);
         if (row.active) {
           parent.snd = (parent.snd ?? 0) + result;
@@ -110,19 +110,35 @@ class ReportState extends State<Report> {
       }
     });
 
+    data.forEach((row) {
+      if (row.active) {
+        if (row.snd != null || row.dto != null || row.kto != null) {
+          row.skd = (row.snd ?? 0) + (row.dto ?? 0) - (row.kto ?? 0);
+        }
+      } else {
+        if (row.snk != null || row.dto != null || row.kto != null) {
+          row.skk = (row.snk ?? 0) + (row.kto ?? 0) - (row.dto ?? 0);
+        }
+      }
+    });
+
     setState(() {
       reportData.clear();
-      data.forEachIndexed((index, element) {
-        final style = data[index].isSubAccount ? null : titleStyle;
+      data.forEach((row) {
+        if (row.snd == null && row.snk == null && row.dto == null && row.kto == null
+          && row.skd == null && row.skk == null) {
+          return;
+        }
+        final style = row.isSubAccount ? null : titleStyle;
         reportData.add(DataRow(
           cells: [
-            createCell('${data[index].isSubAccount ? '- ' : ''}${data[index].account}', style),
-            createCell('${data[index].snd ?? ''}', style),
-            createCell('${data[index].snk ?? ''}', style),
-            createCell('${data[index].dto ?? ''}', style),
-            createCell('${data[index].kto ?? ''}', style),
-            createCell('${data[index].skd ?? ''}', style),
-            createCell('${data[index].skk ?? ''}', style),
+            createCell('${row.isSubAccount ? '- ' : ''}${row.account}', style),
+            createCell('${row.snd ?? ''}', style),
+            createCell('${row.snk ?? ''}', style),
+            createCell('${row.dto ?? ''}', style),
+            createCell('${row.kto ?? ''}', style),
+            createCell('${row.skd ?? ''}', style),
+            createCell('${row.skk ?? ''}', style),
           ],
         ));
       });

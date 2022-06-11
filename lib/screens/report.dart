@@ -81,7 +81,16 @@ class ReportState extends State<Report> {
     data.sort((a, b) => (a.active == b.active ? 0 : (a.active ? -1 : 1)));
 
     flows.forEach((flow) {
-      final row = data.firstWhere((element) => element.accountId == flow['account'] && (flow['sub'] == '' || flow['sub'] == element.account));
+      final reportRow = data.firstWhereOrNull((element) => element.accountId == flow['account'] && (flow['sub'] == '' || flow['sub'] == element.account));
+      if (reportRow == null) {
+        // subAccount can be changed
+        final accountIndex = data.indexWhere((element) => element.accountId == flow['account']);
+        // let's add
+        data.insert(accountIndex + 1, ReportRow(flow['account'],flow['sub'], data[accountIndex].active, true));
+      }
+      final row = reportRow != null ? reportRow
+          : data.firstWhere((element) => element.accountId == flow['account'] && (flow['sub'] == '' || flow['sub'] == element.account));
+
       row.dto = flow['SUM(do)'];
       row.kto = flow['SUM(ko)'];
       if (row.isSubAccount) {
@@ -110,6 +119,8 @@ class ReportState extends State<Report> {
       }
     });
 
+    final sumRow = ReportRow(0, 'Итого', false, false);
+
     data.forEach((row) {
       if (row.active) {
         if (row.snd != null || row.dto != null || row.kto != null) {
@@ -120,7 +131,16 @@ class ReportState extends State<Report> {
           row.skk = (row.snk ?? 0) + (row.kto ?? 0) - (row.dto ?? 0);
         }
       }
+      if (!row.isSubAccount) {
+        sumRow.snd = (sumRow.snd ?? 0) + (row.snd ?? 0);
+        sumRow.snk = (sumRow.snk ?? 0) + (row.snk ?? 0);
+        sumRow.dto = (sumRow.dto ?? 0) + (row.dto ?? 0);
+        sumRow.kto = (sumRow.kto ?? 0) + (row.kto ?? 0);
+        sumRow.skd = (sumRow.skd ?? 0) + (row.skd ?? 0);
+        sumRow.skk = (sumRow.skk ?? 0) + (row.skk ?? 0);
+      }
     });
+    data.add(sumRow);
 
     setState(() {
       reportData.clear();
@@ -132,7 +152,7 @@ class ReportState extends State<Report> {
         final style = row.isSubAccount ? null : titleStyle;
         reportData.add(DataRow(
           cells: [
-            createCell('${row.isSubAccount ? '- ' : ''}${row.account}', style),
+            createCell('${row.isSubAccount ? '  ' : ''}${row.account}', style),
             createCell('${row.snd ?? ''}', style),
             createCell('${row.snk ?? ''}', style),
             createCell('${row.dto ?? ''}', style),

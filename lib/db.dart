@@ -79,7 +79,7 @@ class Db {
   }
 
   Future<List<Map<String, dynamic>>> getAccounts() async {
-    return db.query('accounts', columns: ['name', 'active', 'sub', 'rowid'], orderBy: 'name');
+    return db.query('accounts', columns: ['name', 'active', 'sub', 'rowid', 'hidesubbalance'], orderBy: 'name');
   }
 
   Future<Map<String, dynamic>> getAccount(int id) async {

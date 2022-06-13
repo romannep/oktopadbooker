@@ -36,6 +36,7 @@ class ReportRow {
   int accountId;
   bool active;
   bool isSubAccount;
+  bool hideBalance;
 
   int? snd;
   int? snk;
@@ -44,7 +45,7 @@ class ReportRow {
   int? skd;
   int? skk;
 
-  ReportRow(this.accountId, this.account, this.active, this.isSubAccount);
+  ReportRow(this.accountId, this.account, this.active, this.isSubAccount, this.hideBalance);
 }
 
 
@@ -73,9 +74,9 @@ class ReportState extends State<Report> {
     final List<ReportRow> data = [];
     final accountsData = await Db.instance.getAccounts();
     accountsData.forEach((element) {
-      data.add(ReportRow(element['rowid'], element['name'], element['active'] == 1, false));
+      data.add(ReportRow(element['rowid'], element['name'], element['active'] == 1, false, false));
       final sub = (jsonDecode(element['sub']) as List<dynamic>).cast<String>();
-      sub.forEach((subName) => data.add(ReportRow(element['rowid'], subName, element['active'] == 1, true)));
+      sub.forEach((subName) => data.add(ReportRow(element['rowid'], subName, element['active'] == 1, true, element['hidesubbalance'] == 1)));
     });
 
     data.sort((a, b) => (a.active == b.active ? 0 : (a.active ? -1 : 1)));
@@ -86,7 +87,7 @@ class ReportState extends State<Report> {
         // subAccount can be changed
         final accountIndex = data.indexWhere((element) => element.accountId == flow['account']);
         // let's add
-        data.insert(accountIndex + 1, ReportRow(flow['account'],flow['sub'], data[accountIndex].active, true));
+        data.insert(accountIndex + 1, ReportRow(flow['account'],flow['sub'], data[accountIndex].active, true, accountsData.firstWhere((element) => element['rowid'] == flow['account'])['hidesubbalance'] == 1));
       }
       final row = reportRow != null ? reportRow
           : data.firstWhere((element) => element.accountId == flow['account'] && (flow['sub'] == '' || flow['sub'] == element.account));
@@ -119,7 +120,7 @@ class ReportState extends State<Report> {
       }
     });
 
-    final sumRow = ReportRow(0, 'Итого', false, false);
+    final sumRow = ReportRow(0, 'Итого', false, false, false);
 
     data.forEach((row) {
       if (row.active) {
@@ -138,6 +139,13 @@ class ReportState extends State<Report> {
         sumRow.kto = (sumRow.kto ?? 0) + (row.kto ?? 0);
         sumRow.skd = (sumRow.skd ?? 0) + (row.skd ?? 0);
         sumRow.skk = (sumRow.skk ?? 0) + (row.skk ?? 0);
+      }
+
+      if (row.hideBalance) {
+        row.snd = null;
+        row.snk = null;
+        row.skd = null;
+        row.skk = null;
       }
     });
     data.add(sumRow);

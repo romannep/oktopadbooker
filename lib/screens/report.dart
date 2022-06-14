@@ -1,7 +1,10 @@
 
 
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:csv/csv.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
@@ -55,6 +58,7 @@ class ReportState extends State<Report> {
   ReportState({ required this.appState });
 
   final List<DataRow> reportData = [];
+  List<ReportRow> reportRows = [];
   DateTime startDate = DateTime.now();
   DateTime endDate = DateTime.now();
 
@@ -151,6 +155,7 @@ class ReportState extends State<Report> {
     data.add(sumRow);
 
     setState(() {
+      reportRows = data;
       reportData.clear();
       data.forEach((row) {
         if (row.snd == null && row.snk == null && row.dto == null && row.kto == null
@@ -200,6 +205,67 @@ class ReportState extends State<Report> {
     }
   }
 
+  export() async {
+    String? filename = await FilePicker.platform.saveFile(type: FileType.custom, allowedExtensions: ['csv']);
+    print('res = $filename');
+    if (filename == null) {
+      return;
+    }
+    if (!filename.endsWith('.csv')) {
+      filename = '$filename.csv';
+    }
+    List<List<String>> data = [];
+    data.add(['Период с',formatDate(startDate.toLocal()),'по', formatDate(endDate.toLocal())]);
+    data.add([]);
+    data.add(['Счет','СНД','СКК','ДО','КО','СКД','СКК']);
+    reportRows.forEach((row) {
+      if (row.snd == null && row.snk == null && row.dto == null && row.kto == null
+          && row.skd == null && row.skk == null) {
+        return;
+      }
+      data.add([
+        '${row.isSubAccount ? '- ' : ''}${row.account}',
+        '${row.snd ?? ''}',
+        '${row.snk ?? ''}',
+        '${row.dto ?? ''}',
+        '${row.kto ?? ''}',
+        '${row.skd ?? ''}',
+        '${row.skd ?? ''}',
+      ]);
+    });
+
+    final csvData = ListToCsvConverter().convert(data);
+
+    File f = File(filename);
+
+    f.writeAsString(csvData);
+
+    showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Экспорт в CSV'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('Данные экспортированы в ${filename}'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   final scrollController = ScrollController();
 
   @override
@@ -221,6 +287,9 @@ class ReportState extends State<Report> {
             marginWidget,
             Text(formatDate(endDate.toLocal())),
             IconButton(onPressed: () => _selectDate(context, false), icon: Icon(Icons.calendar_month)),
+            marginWidget,
+            marginWidget,
+            createButton('Экспорт в CSV', export),
           ],
         ),
         marginWidget,

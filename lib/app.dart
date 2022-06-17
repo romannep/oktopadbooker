@@ -12,7 +12,11 @@ import 'package:oktopadbooker/screens/start.dart';
 import 'db.dart';
 
 const PRIMARY_COLOR_VALUE = 0xFF088596;
+const PRIMARY_COLOR_DARK_VALUE = 0xFF055863;
+
 const PRIMARY_COLOR = Color(PRIMARY_COLOR_VALUE);
+const PRIMARY_COLOR_DARK = Color(PRIMARY_COLOR_DARK_VALUE);
+
 const PRIMARY_COLOR_MATERIAL = MaterialColor(PRIMARY_COLOR_VALUE, const <int, Color>{
   50:  const Color(0xFFe0e0e0),
   100: const Color(0xFFb3b3b3),
@@ -32,13 +36,17 @@ final BUTTON_STYLE = TextButton.styleFrom(
   backgroundColor: PRIMARY_COLOR,
 );
 
+final BUTTON_STYLE_DARK = TextButton.styleFrom(
+  backgroundColor: PRIMARY_COLOR_DARK,
+);
+
 const BUTTON_TEXT_STYLE = const TextStyle(color: Colors.white);
 
 const DEBOUNCE_TIMEOUT_MS = 1000;
 
-Widget createButton(String label, void Function() onPressed) => ElevatedButton(
+Widget createButton(String label, void Function() onPressed, [bool selected = false]) => ElevatedButton(
   onPressed: onPressed,
-  style: BUTTON_STYLE,
+  style: selected ? BUTTON_STYLE_DARK : BUTTON_STYLE,
   child: Text(label, style: BUTTON_TEXT_STYLE),
 );
 
@@ -151,6 +159,16 @@ class AppState extends State<App> {
     processNavigate(page + 1);
   }
 
+  move(int toPage) async {
+    final page = pageController.page!.toInt();
+    if (screens[page].controller.onLeave != null) {
+      await screens[page].controller.onLeave!();
+    }
+    animateTo(pageController, toPage);
+    processNavigate(toPage);
+  }
+
+
   processNavigate([newPage = -1]) {
     setState(() {
       int page = newPage > -1 ? newPage : pageController.page!.toInt();
@@ -160,9 +178,13 @@ class AppState extends State<App> {
       title = screens[page].title;
       int pageCount = screens.length - 2;
       buttons.clear();
-      buttons.add(IconButton(onPressed: page > 0 ? back : null, icon: Icon(Icons.arrow_back)));
-      buttons.add(IconButton(onPressed: page < pageCount ? forward : null, icon: Icon(Icons.arrow_forward)));
-      buttons.add(Text(title));
+      // buttons.add(IconButton(onPressed: page > 0 ? back : null, icon: Icon(Icons.arrow_back)));
+      // buttons.add(IconButton(onPressed: page < pageCount ? forward : null, icon: Icon(Icons.arrow_forward)));
+
+      for (int i = 0; i < screens.length - 1; i++) {
+        buttons.add(createButton(screens[i].title, () => move(i), i == page));
+        buttons.add(marginWidget);
+      }
     });
   }
 
@@ -170,13 +192,12 @@ class AppState extends State<App> {
   void initState() {
     final item = ScreenItem(
       widget: ScreenWrapper(StartScreen(appState: this)),
-      title: '',
+      title: 'Главное',
       controller: ScreenController(),
     );
     screens.add(item);
     screens.add(item);
-    buttons.add(IconButton(onPressed: null, icon: Icon(Icons.arrow_back)));
-    buttons.add(IconButton(onPressed: null, icon: Icon(Icons.arrow_forward)));
+    processNavigate(0);
     super.initState();
 
     Db.instance.init();

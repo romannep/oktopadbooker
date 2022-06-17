@@ -195,7 +195,7 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
                 decoration: InputDecoration(labelText: 'Сумма'),
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                  FilteringTextInputFormatter.allow(RegExp(r'-?[0-9]')),
                 ],
               ),
             ),

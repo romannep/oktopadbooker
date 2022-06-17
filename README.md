@@ -6,5 +6,4 @@
 [Двойная запись и финансовый результат](https://github.com/romannep/oktopadbooker/blob/master/article/ARTICLE.md)
 
 TODO
-- ввод отрицательной суммы
 - размер окна приложения при старте

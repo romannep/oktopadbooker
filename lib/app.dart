@@ -251,7 +251,7 @@ class AppState extends State<App> {
         }
         case Screen.Records: {
           final item = ScreenItem(
-            widget: ScreenWrapper(Records(appState: this)),
+            widget: Records(appState: this),
             title: 'Проводки',
             controller: ScreenController(),
           );

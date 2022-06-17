@@ -68,26 +68,34 @@ class RecordsState extends State<Records> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      //crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        createButton('Добавить новую проводку', newAccount),
         marginWidget,
         Expanded(
           child: Scrollbar(controller: scrollController, isAlwaysShown: true, child: SingleChildScrollView(
             controller: scrollController,
             scrollDirection: Axis.horizontal,
-            child: SingleChildScrollView(child: DataTable(
-              showCheckboxColumn: false,
-              columns: [
-                DataColumn(label: Text('Дата', style: titleStyle)),
-                DataColumn(label: Text('Дт', style: titleStyle)),
-                DataColumn(label: Text('Кт', style: titleStyle)),
-                DataColumn(label: Text('Сумма', style: titleStyle)),
-                DataColumn(label: Text('Комментарий', style: titleStyle)),
-              ],
-              // defaultColumnWidth: const IntrinsicColumnWidth(),
-              rows: records,
-            )),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  createButton('Добавить новую проводку', newAccount),
+                  marginWidget,
+                  DataTable(
+                    showCheckboxColumn: false,
+                    columns: [
+                      DataColumn(label: Text('Дата', style: titleStyle)),
+                      DataColumn(label: Text('Дт', style: titleStyle)),
+                      DataColumn(label: Text('Кт', style: titleStyle)),
+                      DataColumn(label: Text('Сумма', style: titleStyle)),
+                      DataColumn(label: Text('Комментарий', style: titleStyle)),
+                    ],
+                    // defaultColumnWidth: const IntrinsicColumnWidth(),
+                    rows: records,
+                  ),
+                ],
+              ),
+            ),
           )),
         ),
       ],

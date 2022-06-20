@@ -72,6 +72,12 @@ class AccountsState extends State<Accounts> {
   }
 
   @override
+  void dispose() {
+    print('accounts dispose');
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final actives = activeAccounts.map((e) => createListItem(e.name, e.id, openAccount)).toList();
     final passives = passiveAccounts.map((e) => createListItem(e.name, e.id, openAccount)).toList();

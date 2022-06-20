@@ -36,17 +36,23 @@ final BUTTON_STYLE = TextButton.styleFrom(
   backgroundColor: PRIMARY_COLOR,
 );
 
-final BUTTON_STYLE_DARK = TextButton.styleFrom(
+final BUTTON_STYLE_MENU = TextButton.styleFrom(
+  backgroundColor: PRIMARY_COLOR,
+  elevation: 0,
+);
+
+final BUTTON_STYLE_MENU_DARK = TextButton.styleFrom(
   backgroundColor: PRIMARY_COLOR_DARK,
+  elevation: 0,
 );
 
 const BUTTON_TEXT_STYLE = const TextStyle(color: Colors.white);
 
 const DEBOUNCE_TIMEOUT_MS = 1000;
 
-Widget createButton(String label, void Function() onPressed, [bool selected = false]) => ElevatedButton(
+Widget createButton(String label, void Function() onPressed, [bool? selected]) => ElevatedButton(
   onPressed: onPressed,
-  style: selected ? BUTTON_STYLE_DARK : BUTTON_STYLE,
+  style: selected == null ? BUTTON_STYLE : (selected ? BUTTON_STYLE_MENU_DARK : BUTTON_STYLE_MENU),
   child: Text(label, style: BUTTON_TEXT_STYLE),
 );
 
@@ -76,8 +82,8 @@ class ScreenParams {
   });
 }
 
-void animateTo(PageController pageController, int page) {
-  pageController.animateToPage(page, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
+animateTo(PageController pageController, int page) async {
+  await pageController.animateToPage(page, duration: Duration(milliseconds: PAGE_SCROLL_TIME_MS), curve: Curves.linear);
 }
 
 class App extends StatefulWidget {
@@ -125,7 +131,9 @@ class ScreenItem {
   Widget widget;
   String title;
   ScreenController controller;
+  Screen screen;
   ScreenItem({
+    required this.screen,
     required this.widget,
     required this.title,
     required this.controller,
@@ -176,21 +184,29 @@ class AppState extends State<App> {
         screens[page].controller.onActivate!();
       }
       title = screens[page].title;
-      int pageCount = screens.length - 2;
+      final screen = screens[page].screen;
       buttons.clear();
       // buttons.add(IconButton(onPressed: page > 0 ? back : null, icon: Icon(Icons.arrow_back)));
       // buttons.add(IconButton(onPressed: page < pageCount ? forward : null, icon: Icon(Icons.arrow_forward)));
 
-      for (int i = 0; i < screens.length - 1; i++) {
-        buttons.add(createButton(screens[i].title, () => move(i), i == page));
-        buttons.add(marginWidget);
-      }
+      // for (int i = 0; i < screens.length - 1; i++) {
+      //   buttons.add(createButton(screens[i].title, () => move(i), i == page));
+      //   buttons.add(marginWidget);
+      // }
+
+      buttons.add(createButton('План счетов', () => navigate(Screen.Accounts), screen == Screen.Accounts));
+      buttons.add(marginWidget);
+      buttons.add(createButton('Проводки', () => navigate(Screen.Records), screen == Screen.Records));
+      buttons.add(marginWidget);
+      buttons.add(createButton('Отчет', () => navigate(Screen.Report), screen == Screen.Report));
+
     });
   }
 
   @override
   void initState() {
     final item = ScreenItem(
+      screen: Screen.Start,
       widget: ScreenWrapper(StartScreen(appState: this)),
       title: 'Главное',
       controller: ScreenController(),
@@ -208,6 +224,7 @@ class AppState extends State<App> {
     return Scaffold(
       appBar: AppBar(
         title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: buttons,
         ),
       ),
@@ -231,6 +248,7 @@ class AppState extends State<App> {
         case Screen.Accounts: {
           final controller = ScreenController();
           final item = ScreenItem(
+            screen: Screen.Accounts,
             widget: ScreenWrapper(Accounts(appState: this, screenController: controller)),
             title: 'Счета',
             controller: controller,
@@ -242,6 +260,7 @@ class AppState extends State<App> {
           final key = UniqueKey();
           final controller = ScreenController();
           final item = ScreenItem(
+            screen: Screen.Account,
             widget: ScreenWrapper(Account(appState: this, key: key, itemId: params?.id, controller: controller)),
             title: 'Счет',
             controller: controller,
@@ -251,6 +270,7 @@ class AppState extends State<App> {
         }
         case Screen.Records: {
           final item = ScreenItem(
+            screen: Screen.Records,
             widget: Records(appState: this),
             title: 'Проводки',
             controller: ScreenController(),
@@ -262,6 +282,7 @@ class AppState extends State<App> {
           final key = UniqueKey();
           final controller = ScreenController();
           final item = ScreenItem(
+            screen: Screen.Record,
             widget: ScreenWrapper(Record(appState: this, key: key, itemId: params?.id, controller: controller)),
             title: 'Проводка',
             controller: controller,
@@ -271,7 +292,7 @@ class AppState extends State<App> {
         }
         case Screen.Report: {
           final item = ScreenItem(
-            // widget: Center(child: Row( children: [Report(appState: this)], mainAxisAlignment: MainAxisAlignment.center)),
+            screen: Screen.Report,
             widget: Report(appState: this),
             title: 'Результат',
             controller: ScreenController(),
@@ -284,6 +305,7 @@ class AppState extends State<App> {
         }
       }
       final item = ScreenItem(
+        screen: Screen.Start,
         widget: ScreenWrapper(StartScreen(appState: this)),
         title: '',
         controller: ScreenController(),

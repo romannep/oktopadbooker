@@ -129,9 +129,11 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
 
   @override
   Widget build(BuildContext context) {
-    final widget = Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        createButton('← к Плану счетов', () => widget.appState.back()),
+        marginWidget, marginWidget,
         TextField(
           decoration: InputDecoration(labelText: 'Название'),
           controller: textNameController,
@@ -182,8 +184,6 @@ class AccountState extends State<Account> with AutomaticKeepAliveClientMixin<Acc
         )),
       ],
     );
-
-    return widget;
   }
 
   @override

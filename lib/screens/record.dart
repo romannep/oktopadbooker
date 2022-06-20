@@ -173,9 +173,11 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
 
   @override
   Widget build(BuildContext context) {
-    final widget = Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        createButton('← к Списку проводок', () => widget.appState.back()),
+        marginWidget, marginWidget,
         Row(
           children: [
             Flexible(
@@ -295,8 +297,6 @@ class AccountState extends State<Record> with AutomaticKeepAliveClientMixin<Reco
         ),
       ],
     );
-
-    return widget;
   }
 
   @override

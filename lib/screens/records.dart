@@ -79,7 +79,12 @@ class RecordsState extends State<Records> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  createButton('Добавить новую проводку', newAccount),
+                  Row(
+                    children: [
+                      marginWidget,
+                      createButton('Добавить новую проводку', newAccount),
+                    ],
+                  ),
                   marginWidget,
                   DataTable(
                     showCheckboxColumn: false,

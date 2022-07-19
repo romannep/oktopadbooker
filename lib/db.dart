@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:sqflite/sqflite.dart';
@@ -13,15 +12,23 @@ class Db {
   late Database db;
   init() async {
     Map<String, String> envVars = Platform.environment;
-    print('User homedir: ${envVars['UserProfile']}');
-    final path= Directory('${envVars['UserProfile']}/$APP_FOLDER');
-    if ((await path.exists())){
+    String home = "";
+    if (Platform.isMacOS) {
+      home = envVars['HOME']!;
+    } else if (Platform.isLinux) {
+      home = envVars['HOME']!;
+    } else if (Platform.isWindows) {
+      home = envVars['UserProfile']!;
+    }
+    print('User homedir: ${home}');
+    final path = Directory('${home}/$APP_FOLDER');
+    if ((await path.exists())) {
       print('Path exist');
-    }else{
+    } else {
       await path.create();
       print('Path created');
     }
-    final dbPath = '${envVars['UserProfile']}/$APP_FOLDER/$DB_FILENAME';
+    final dbPath = '${home}/$APP_FOLDER/$DB_FILENAME';
     sqfliteFfiInit();
     databaseFactory = databaseFactoryFfi;
     db = await openDatabase(
@@ -79,11 +86,16 @@ class Db {
   }
 
   Future<List<Map<String, dynamic>>> getAccounts() async {
-    return db.query('accounts', columns: ['name', 'active', 'sub', 'rowid', 'hidesubbalance'], orderBy: 'name');
+    return db.query('accounts',
+        columns: ['name', 'active', 'sub', 'rowid', 'hidesubbalance'],
+        orderBy: 'name');
   }
 
   Future<Map<String, dynamic>> getAccount(int id) async {
-    final data = await db.query('accounts', columns: ['name', 'active', 'sub', 'hidesubbalance'], where: 'rowid = ?', whereArgs: [id]);
+    final data = await db.query('accounts',
+        columns: ['name', 'active', 'sub', 'hidesubbalance'],
+        where: 'rowid = ?',
+        whereArgs: [id]);
     return data[0];
   }
 
@@ -110,7 +122,10 @@ class Db {
 
     await db.delete('flows', where: 'record = ?', whereArgs: [newId]);
 
-    if (record['dt'] != null && record['dt'] > 0 && record['kt'] != null && record['kt'] > 0) {
+    if (record['dt'] != null &&
+        record['dt'] > 0 &&
+        record['kt'] != null &&
+        record['kt'] > 0) {
       await db.insert(
         'flows',
         {
@@ -140,27 +155,36 @@ class Db {
   }
 
   Future<List<Map<String, dynamic>>> getRecords() async {
-    return db.rawQuery('SELECT r.rowid, r.date, r.sum, r.comment, dtsub, ktsub, a.name as dtname, b.name as ktname FROM records r LEFT JOIN accounts a ON r.dt = a.rowid LEFT JOIN accounts b ON r.kt = b.rowid ORDER BY r.date DESC');
+    return db.rawQuery(
+        'SELECT r.rowid, r.date, r.sum, r.comment, dtsub, ktsub, a.name as dtname, b.name as ktname FROM records r LEFT JOIN accounts a ON r.dt = a.rowid LEFT JOIN accounts b ON r.kt = b.rowid ORDER BY r.date DESC');
   }
 
   Future<Map<String, dynamic>> getRecord(int id) async {
-    final data = await db.query('records', columns: ['date', 'sum', 'comment', 'dt', 'dtsub', 'kt', 'ktsub'], where: 'rowid = ?', whereArgs: [id]);
+    final data = await db.query('records',
+        columns: ['date', 'sum', 'comment', 'dt', 'dtsub', 'kt', 'ktsub'],
+        where: 'rowid = ?',
+        whereArgs: [id]);
     return data[0];
   }
 
-  Future<List<Map<String, dynamic>>> getSumFlows(DateTime date, [DateTime? startDate]) async {
+  Future<List<Map<String, dynamic>>> getSumFlows(DateTime date,
+      [DateTime? startDate]) async {
     List<Map<String, dynamic>> data;
     if (startDate == null) {
-      data = await db.rawQuery('SELECT account, sub, SUM(do), SUM(ko) FROM flows WHERE date < ? GROUP BY account, sub', [date.toIso8601String()]);
+      data = await db.rawQuery(
+          'SELECT account, sub, SUM(do), SUM(ko) FROM flows WHERE date < ? GROUP BY account, sub',
+          [date.toIso8601String()]);
     } else {
-      data = await db.rawQuery('SELECT account, sub, SUM(do), SUM(ko) FROM flows WHERE date < ? AND date >= ? GROUP BY account, sub', [date.toIso8601String(), startDate.toIso8601String()]);
+      data = await db.rawQuery(
+          'SELECT account, sub, SUM(do), SUM(ko) FROM flows WHERE date < ? AND date >= ? GROUP BY account, sub',
+          [date.toIso8601String(), startDate.toIso8601String()]);
     }
     return data;
   }
 
-  Future<List<Map<String, dynamic>>> getFlows(DateTime startDate, DateTime endDate) async {
+  Future<List<Map<String, dynamic>>> getFlows(
+      DateTime startDate, DateTime endDate) async {
     final data = await db.query('flows');
     return data;
   }
 }
-

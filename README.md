@@ -1,9 +1,8 @@
 # Oktopad Booker
 
-Приложение для расчета финансового результата 
+Расчета финансового результата 
 с помощью двойной записи
 
-[Двойная запись и финансовый результат](https://github.com/romannep/oktopadbooker/blob/master/article/ARTICLE.md)
+[Методика](https://github.com/romannep/oktopadbooker/blob/master/article/ARTICLE.md)
 
-TODO
-- размер окна приложения при старте
+[Приложение](https://github.com/romannep/oktopadbooker/releases)
